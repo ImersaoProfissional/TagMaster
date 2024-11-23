@@ -50,6 +50,91 @@ openPopupCriarNota.addEventListener('click', () => {
     }
 });
 
+// Defina as funções fora do escopo do addEventListener
+function criarTag() {
+    const tagName = document.getElementById("texto").value;
+    const tagColor = document.getElementById("cor").value;
+
+    console.log("Criar Tag:", tagName, tagColor);
+
+    // Verificar se os campos não estão vazios
+    if (!tagColor || !tagName) {
+        alert("Por favor, preencha todos os campos.");
+        return;
+    }
+
+    // Enviar a requisição POST para o backend
+    fetch('http://localhost:3001/criarTag', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ tagName, tagColor }), // Envia os dados no corpo da requisição
+    })
+    
+}
+
+
+function editarTag(id) {
+    const titulo = document.getElementById("texto").value;
+    const cor = document.getElementById("cor").value;
+
+    console.log("Editar Tag:", id, titulo, cor);
+
+    // Verificar se os campos não estão vazios
+    if (!titulo || !cor) {
+        alert("Por favor, preencha todos os campos.");
+        return;
+    }
+
+    // Enviar a requisição POST para o backend com o ID na URL
+    fetch(`http://localhost:3001/editarTag/${id}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ titulo, cor }), // Envia os dados no corpo da requisição
+    })
+    .then(response => response.json()) // Espera pela resposta e a converte para JSON
+    .then(data => {
+        if (data.success) {
+            alert("Tag editada com sucesso!");
+        } else {
+            alert("Falha ao editar tag.");
+        }
+    })
+    .catch(error => {
+        console.error('Erro:', error);
+        alert("Ocorreu um erro ao editar a tag.");
+    });
+}
+
+
+function excluirTag(id) {
+    console.log("Excluir Tag:", id);
+
+    // Enviar a requisição POST para o backend para excluir a tag com o ID especificado
+    fetch(`http://localhost:3001/excluirTag/${id}`, {
+        method: 'POST', // Usamos POST para excluir a tag
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    })
+    .then(response => response.json()) // Espera pela resposta e a converte para JSON
+    .then(data => {
+        if (data.success) {
+            alert("Tag excluída com sucesso!");
+        } else {
+            alert("Falha ao excluir tag.");
+        }
+    })
+    .catch(error => {
+        console.error('Erro:', error);
+        alert("Ocorreu um erro ao excluir a tag.");
+    });
+}
+
+
 openPopupTags.addEventListener('click', () => {
     overlay.style.display = 'flex'; // Exibe o overlay e o popup
 
@@ -57,24 +142,49 @@ openPopupTags.addEventListener('click', () => {
 
     if (popup) {
         popup.innerHTML = `
-          <h1 class="fs-1 text- azulEscuro text-white p-2 fw-bold">Tags</h1>
-            <div class="container">
-                <form id="formCriarTag" method="post" action="http://localhost:3001/criarTag">
-                    <button class="btn btn-custom btn-create mt-5 mb-2" type="submit">+ Criar Tag</button>
-                    <div class="input-group mb-3">
-                        <div class="input-group-text">
-                            <input type="color" class="form-control form-control-color" id="tagColor" value="#dc3545"
-                                title="Escolha uma cor" name="tagColor" required>
-                        </div>
-                        <input type="text" class="form-control text-white bg-secondary" id="tagName"
-                            placeholder="Nome da tag" name="tagName" required>
+          <h1 class="fs-1 text-white p-4 fw-bold text-center" style="background-color: #003366;">Tags</h1>
+
+            <!-- Container -->
+            <div class="container mt-4">
+                <!-- Botão para Criar Tag -->
+                <button class="btn btn-primary mb-4" onclick="criarTag()">+ Criar Tag</button>
+
+                <!-- Inputs para Criar ou Editar Tag -->
+                <div class="row mb-4">
+                    <div class="col-md-6 mb-3">
+                        <label for="texto" class="form-label">Título da Tag</label>
+                        <input type="text" name="texto" id="texto" class="form-control text-white" placeholder="Digite o título da tag">
                     </div>
-                
-                    
+                    <div class="col-md-6 mb-3">
+                        <label for="cor" class="form-label">Cor</label>
+                        <input type="color" name="cor" id="cor" class="form-control">
+                    </div>
+                </div>
 
-
-                <button type="button" class="btn azulEscuro mb-2" id="closePopup">Voltar</button>
+                <!-- Tabela de Tags -->
+                <table class="table table-striped tag-table">
+                    <thead>
+                        <tr>
+                            <th>Título</th>
+                            <th>Cor</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tags-list">
+                        <tr>
+                            <td>Fazer AEP</td>
+                            <td>
+                                <input type="color" name="cor" id="cor" class="form-control" disabled>
+                            </td>
+                            <td>
+                                <button class="btn btn-warning btn-sm" onclick="editarTag(1)">Editar</button>
+                                <button class="btn btn-danger btn-sm" onclick="excluirTag(1)">Excluir</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
+
         `;
     }
 });

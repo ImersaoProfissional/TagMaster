@@ -26,7 +26,7 @@ app.get('/login', async (req: Request, res: Response) => {
     const access_token = req.cookies.access_token;
     console.log(access_token + "<-- acess token") // validar se esta chamado o acess token
     if (access_token) {
-      const response = await axios.get('http://localhost:3000/profile', {
+      const response = await axios.get('http://localhost:3000/auth/login', {
         headers: {
           Authorization: `Bearer ${access_token}`,
         },
@@ -43,6 +43,65 @@ app.get('/login', async (req: Request, res: Response) => {
     // Pode adicionar uma mensagem de erro ou logar o problema
   }
   res.render('login');
+});
+
+app.post('/login', async (req: Request, res: Response) => {
+  const { email, password } = req.body;
+
+  try {
+    const response = await axios.post("http://localhost:3000/auth/login", {
+      email,
+      password
+    });
+
+    console.log(response)
+
+    const { access_token } = response.data;
+
+    res.cookie("access_token", access_token, {
+      httpOnly: true,
+      secure: false,
+      maxAge: 24 * 60 * 60 * 1000 // 1 dia em milisegundos
+    });
+
+  } catch (error) {
+    console.log("Erro ao fazer login :" + error)
+    return res.redirect('login');
+  }
+
+  return res.redirect('/');
+})
+
+// Rota de cadastro
+app.get('/cadastro', async (req: Request, res: Response) => {
+  res.render('cadastro')
+})
+
+app.post('/cadastro', async (req: Request, res: Response) => {
+  const { name, email, password, confirmpassword } = req.body;
+
+  if (password !== confirmpassword) {
+    console.log('As senhas não coincidem!');
+    return res.redirect('/cadastro?error=passwordMismatch');
+  }
+
+  try {
+    // Envio para a API de criação de usuário
+    await axios.post("http://localhost:3000/user/cadastro", {
+      name,
+      email,
+      password,
+    });
+
+    // Redireciona para login em caso de sucesso
+    return res.redirect('/login');
+  } catch (error) {
+    console.error('Erro na criação de usuário:', error);
+
+    // Verifica detalhes do erro (exemplo: se a API retorna mensagens específicas)
+    const errorMessage = 'Erro desconhecido';
+    return res.redirect(`/cadastro?error=${encodeURIComponent(errorMessage)}`);
+  }
 });
 
 // Rota da página inicial
@@ -109,65 +168,7 @@ app.get('/', async (req: Request, res: Response) => {
   // res.redirect('/login');
 });
 
-// Rota de cadastro
-app.get('/cadastro', async (req: Request, res: Response) => {
-  res.render('cadastro')
-})
-
 // Rota de criar cadastro
-app.post('/cadastro', async (req: Request, res: Response) => {
-  const { name, email, password, confirmpassword } = req.body;
-
-  if (password !== confirmpassword) {
-    console.log('As senhas não coincidem!');
-    return res.redirect('/cadastro?error=passwordMismatch');
-  }
-
-  try {
-    // Envio para a API de criação de usuário
-    await axios.post("http://localhost:3000/cadastro", {
-      name,
-      email,
-      password,
-    });
-
-    // Redireciona para login em caso de sucesso
-    return res.redirect('/login');
-  } catch (error) {
-    console.error('Erro na criação de usuário:', error);
-
-    // Verifica detalhes do erro (exemplo: se a API retorna mensagens específicas)
-    const errorMessage = 'Erro desconhecido';
-    return res.redirect(`/cadastro?error=${encodeURIComponent(errorMessage)}`);
-  }
-});
-
-
-app.post('/login', async (req: Request, res: Response) => {
-  const { email, password } = req.body;
-
-  try {
-    const response = await axios.post("http://localhost:3000/login", {
-      email,
-      password
-    });
-
-    console.log(response)
-
-    const { access_token } = response.data;
-
-    res.cookie("access_token", access_token, {
-      httpOnly: true,
-      secure: false,
-      maxAge: 24 * 60 * 60 * 1000 // 1 dia em milisegundos
-    });
-
-  } catch (error) {
-    console.log("Erro ao fazer login :" + error)
-    return res.redirect('login');
-  }
-  return res.redirect('/');
-})
 
 // app.post('/buscarNotas', async (req: Request, res: Response) => {
 //   basicamente a rota / esta fazendo tudo isso de buscar 
@@ -234,31 +235,14 @@ app.post('/editarNota/:id', async (req: Request, res: Response) => {
 
 })
 
-app.post('/excluirNota/:id', async (req: Request, res: Response) => {
-  try {
-    const access_token = req.cookies.acess_token
+app.post('/excluirTag/:id', async (req: Request, res: Response) => {
+  const { id } = req.params; 
 
-    if (!access_token) {
-      console.log("Token de acesso não encontrado");
-      return res.redirect('/login'); // Redireciona para o login se o token não estiver presente
-    }
+  console.log(`Excluindo a tag com ID: ${id}`);
 
-    const response = await axios.delete(
-      `http://localhost:3000/excluirNota/${req.params.id}`,
-      {
-        headers: {
-          Authorization: `Bearer ${access_token}`
-        }
-      }
-    )
-    console.log("Nota excluida com sucesso:", response.data);
-    return res.redirect('/'); // Redireciona para a home após excluir a nota
-  } catch (error) {
-    console.error("Erro ao excluir nota:", error);
-    return res.redirect('/'); // Redireciona para a home em caso de erro
-  }
-
-})
+  
+  res.status(200).json({ success: true, message: `Tag com ID ${id} excluída com sucesso!` });
+});
 
 app.post('/criarTag', async (req: Request, res: Response) => {
   const { tagColor, tagName } = req.body
@@ -267,7 +251,7 @@ app.post('/criarTag', async (req: Request, res: Response) => {
 
     if (!access_token) {
       console.log("Token de acesso não encontrado");
-      return res.redirect('/login'); // Redireciona para o login se o token não estiver presente
+      return await res.redirect('/login'); // Redireciona para o login se o token não estiver presente
     }
 
     const response = await axios.post(
@@ -280,7 +264,7 @@ app.post('/criarTag', async (req: Request, res: Response) => {
       }
     )
     console.log("Tag criada com sucesso:", response.data);
-    return res.redirect('/'); // Redireciona para a home após criar tag
+    return await res.redirect('/'); // Redireciona para a home após criar tag
   } catch (error) {
     console.error("Erro ao criar tag:", error);
     return res.redirect('/'); // Redireciona para a home em caso de erro
@@ -313,15 +297,15 @@ app.post('/excluirTag/:id', async(req: Request, res: Response) => {
 })
 
 app.post('/editarTag/:id', async (req: Request, res: Response) => {
-  
+  const { id } = req.params; // Pegando o ID da URL
+  const { titulo, cor } = req.body;
 
-  // Aqui você pode colocar a lógica para salvar as alterações no banco de dados
+  // Aqui você pode adicionar a lógica para editar a tag no banco de dados usando o `id`
+  console.log(`Tag com ID ${id} editada:`, { titulo, cor });
 
-  return res.redirect('/'); // Redireciona para a página principal
+  // Simulação de sucesso
+  res.status(200).json({ success: true, message: `Tag com ID ${id} editada com sucesso!` });
 });
-
-
-
 
 // Iniciar o servidor
 app.listen(port, () => {
