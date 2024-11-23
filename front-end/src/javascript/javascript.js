@@ -19,7 +19,7 @@ openPopupCriarNota.addEventListener('click', () => {
     if (popup) {
         popup.innerHTML = `
         <h1 class="fs-1 text- azulEscuro text-white p-2 fw-bold">Criar Nota</h1>
-        <form id="formCriarNota">
+        <form id="formCriarNota" method="post" action="http://localhost:3001/criarNota">
             <div class="mb-1 p-2 mt-5">
                 <label for="text" class="form-label fs-6 fw-bold">Título</label>
                 <input type="text" class="form-control bg-secondary text-white" id="text" name="titulo" required>
@@ -59,7 +59,7 @@ openPopupTags.addEventListener('click', () => {
         popup.innerHTML = `
           <h1 class="fs-1 text- azulEscuro text-white p-2 fw-bold">Tags</h1>
             <div class="container">
-                <form id="formCriarTag">
+                <form id="formCriarTag" method="post" action="http://localhost:3001/criarTag">
                     <button class="btn btn-custom btn-create mt-5 mb-2" type="submit">+ Criar Tag</button>
                     <div class="input-group mb-3">
                         <div class="input-group-text">
@@ -69,97 +69,13 @@ openPopupTags.addEventListener('click', () => {
                         <input type="text" class="form-control text-white bg-secondary" id="tagName"
                             placeholder="Nome da tag" name="tagName" required>
                     </div>
-                </form>
+                
+                    
 
-                <table class="table table-secondary table-bordered table-hover align-middle">
-                    <thead>
-                        <tr>
-                            <th scope="col">Título</th>
-                            <th scope="col">Cor</th>
-                            <th scope="col">Ações</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>
-                                <input type="text" class="form-control text-white bg-secondary tituloTag" 
-                                    value="Urgente" name="titulo" disabled>
-                            </td>
-                            <td>
-                                <input type="color" class="form-control form-control-color colorTag"
-                                    value="#dc3545" name="cor" disabled>
-                            </td>
-                            <td>
-                              <button class="btn btn-primary me-1 btnEditar">
-                                <i class="bi bi-pencil editar"></i>
-                              </button>
-                              <button class="btn btn-danger me-1 my-1 btnExcluir">
-                                <i class="bi bi-trash"></i>
-                              </button>
-                            </td>
-                        </tr>
-                        <!-- Linhas adicionais podem ser adicionadas aqui -->
-                    </tbody>
-                </table>
+
                 <button type="button" class="btn azulEscuro mb-2" id="closePopup">Voltar</button>
             </div>
         `;
-
-        // Adiciona o evento de clique a todos os botões de edição
-        document.querySelectorAll('.btnEditar').forEach(button => {
-            button.addEventListener('click', async (event) => {
-                // Obtém a linha correspondente
-                const row = event.target.closest('tr');
-                
-                // Seleciona os inputs dentro da linha
-                const tituloInput = row.querySelector('.tituloTag');
-                const colorInput = row.querySelector('.colorTag');
-                const icon = button.querySelector('i');
-
-                // Verifica se os inputs estão desabilitados
-                const isDisabled = tituloInput.disabled;
-
-                if (isDisabled) {
-                    // Alterna para modo editável
-                    tituloInput.disabled = false;
-                    colorInput.disabled = false;
-                    icon.className = 'bi bi-check-circle verificado';
-                    tituloInput.focus(); // Foco no input editável
-                } else {
-                    // Salva os dados ao alternar para modo desabilitado
-                    tituloInput.disabled = true;
-                    colorInput.disabled = true;
-                    icon.className = 'bi bi-pencil editar';
-
-                    // Envia os dados via fetch
-                    const titulo = tituloInput.value;
-                    const cor = colorInput.value;
-
-                    // try {
-                    //     const response = await fetch('https://sua-api-endpoint/aqui', {
-                    //         method: 'PUT', // Altere para POST ou PUT, conforme necessário
-                    //         headers: {
-                    //             'Content-Type': 'application/json',
-                    //         },
-                    //         body: JSON.stringify({
-                    //             titulo,
-                    //             cor,
-                    //         }),
-                    //     });
-
-                    //     if (response.ok) {
-                    //         console.log('Dados salvos com sucesso!');
-                    //     } else {
-                    //         console.error('Erro ao salvar dados:', response.statusText);
-                    //         alert('Erro ao salvar dados.');
-                    //     }
-                    // } catch (error) {
-                    //     console.error('Erro na requisição:', error);
-                    //     alert('Erro ao salvar os dados. Tente novamente.');
-                    // }
-                }
-            });
-        });
     }
 });
 
