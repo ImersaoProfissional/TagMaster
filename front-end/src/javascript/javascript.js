@@ -71,9 +71,8 @@ function criarTag() {
         },
         body: JSON.stringify({ tagName, tagColor }), // Envia os dados no corpo da requisição
     })
-    
-}
 
+}
 
 function editarTag(id) {
     const titulo = document.getElementById("texto").value;
@@ -109,7 +108,6 @@ function editarTag(id) {
     });
 }
 
-
 function excluirTag(id) {
     console.log("Excluir Tag:", id);
 
@@ -133,7 +131,6 @@ function excluirTag(id) {
         alert("Ocorreu um erro ao excluir a tag.");
     });
 }
-
 
 openPopupTags.addEventListener('click', () => {
     overlay.style.display = 'flex'; // Exibe o overlay e o popup
@@ -292,7 +289,7 @@ openPopupeEditar.addEventListener('click', () => {
     if (popup) {
         popup.innerHTML = `
         <h1 class="fs-1 text- azulEscuro text-white p-2 fw-bold">Editar Nota</h1>
-        <form id="formCriarNota">
+        <form id="formCriarNota" method="post" action="http://localhost:3001/editarNota/1">
             <div class="mb-1 p-2 mt-5">
                 <label for="text" class="form-label fs-6 fw-bold">Título</label>
                 <input type="text" class="form-control bg-secondary text-white" id="text" name="titulo" value="Fazer AEP" required>

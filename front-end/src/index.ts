@@ -77,6 +77,7 @@ app.get('/cadastro', async (req: Request, res: Response) => {
   res.render('cadastro')
 })
 
+// Rota criar cadastro
 app.post('/cadastro', async (req: Request, res: Response) => {
   const { name, email, password, confirmpassword } = req.body;
 
@@ -104,79 +105,36 @@ app.post('/cadastro', async (req: Request, res: Response) => {
   }
 });
 
-// Rota da página inicial
+// Rota da página inicial --> sendo validado a possibilidade
 app.get('/', async (req: Request, res: Response) => {
-  // try {
-  //   const access_token = req.cookies.access_token;
-
-  //   console.log(access_token + " <-- access token"); 
-
-  //   if (!access_token) {
-  //     // Sem token: redireciona para login
-  //     return res.redirect('/login');
-  //   }
-
-
-  //   const response = await axios.get('http://localhost:3000/profile', {
-  //     headers: {
-  //       Authorization: `Bearer ${access_token}`,
-  //     },
-  //   });
-
-  //   if (response.status === 200) {
-  //     // Token válido: renderiza a home
-
   try {
     // Valida se o token está presente
     const access_token = req.cookies.access_token;
 
-    if (!access_token) {
-      throw new Error("Token de autenticação não encontrado nos cookies.");
-    }
+    // if (!access_token) {
+    //   console.log("Acess_token vazio")
+    //   return res.redirect('login');
+    // }
 
-    // Requisição com configuração correta
-    const response = await axios.post(
-      'http://localhost:3000/buscarNotas',
-      {}, // Corpo da requisição (vazio, caso não haja dados no body)
+    const response = await axios.post( // Requisição com configuração correta
+      'http://localhost:3000/nota',
       {
         headers: {
           Authorization: `Bearer ${access_token}`,
         },
       }
     );
-
-    // Renderiza a página com as notas retornadas
-    return res.render('home', { notas: response.data });
-
+    return res.render('home', { notas: response.data });// Renderiza a página com as notas retornadas
   } catch (error) {
-    console.error("Erro ao buscar notas:");
-
-    // Renderiza a página sem as notas, exibindo o erro (se necessário)
-    return res.render('home', { notas: [], error: "Erro ao buscar notas" });
+    console.error("Erro ao buscar notas");
+    return res.render('home'); // Renderiza a página sem as notas, exibindo o erro (se necessário)
   }
-
-
-  //   }
-  // } catch (error) {
-  //   console.error('Erro ao validar o token:', error);
-
-
-  //   return res.redirect('/login');
-  // }
-
-  // Segurança adicional: Redireciona para login se nenhuma condição for atendida
-  // res.redirect('/login');
 });
 
-// Rota de criar cadastro
-
-// app.post('/buscarNotas', async (req: Request, res: Response) => {
-//   basicamente a rota / esta fazendo tudo isso de buscar 
-// })
-
+// CRUD Notas
 app.post('/criarNota', async (req: Request, res: Response) => {
   const { titulo, conteudo, tags } = req.body;
-
+  console.log(titulo, conteudo, tags)
   try {
     const access_token = req.cookies.access_token;
 
@@ -188,8 +146,8 @@ app.post('/criarNota', async (req: Request, res: Response) => {
 
     // Envia a requisição para a API de backend
     const response = await axios.post(
-      'http://localhost:3000/criarNota',
-      { titulo, conteudo, tags }, // Dados da nota
+      'http://localhost:3000/nota/criar',
+      { nome: titulo, desc: conteudo, tags }, // Dados da nota
       {
         headers: {
           Authorization: `Bearer ${access_token}`, // Cabeçalhos da requisição
@@ -207,7 +165,7 @@ app.post('/criarNota', async (req: Request, res: Response) => {
 
 app.post('/editarNota/:id', async (req: Request, res: Response) => {
   const { titulo, conteudo, data, tags } = req.body
-
+  console.log(titulo, conteudo, data, tags)
   try {
     const access_token = req.cookies.acess_token
 
@@ -217,7 +175,7 @@ app.post('/editarNota/:id', async (req: Request, res: Response) => {
     }
 
     const response = await axios.put(
-      `http://localhost:3000/editarNota/${req.params.id}`,
+      `http://localhost:3000/nota/editar/${req.params.id}`,
       { titulo, conteudo, data, tags },
       {
         headers: {
@@ -229,18 +187,35 @@ app.post('/editarNota/:id', async (req: Request, res: Response) => {
     console.log("Nota atualizada com sucesso:", response.data);
     return res.redirect('/'); // Redireciona para a home após editar a nota
   } catch (error) {
-    console.error("Erro ao atualizar nota:", error);
+    console.error("Erro ao atualizar nota:");
     return res.redirect('/'); // Redireciona para a home em caso de erro
   }
-
 })
 
-app.post('/excluirTag/:id', async (req: Request, res: Response) => {
-  const { id } = req.params; 
+app.post('/excluirNota/:id', async (req: Request, res: Response) => {
+  const { id } = req.params;
 
-  console.log(`Excluindo a tag com ID: ${id}`);
+  try{
+    const access_token = req.cookies.acess_token
 
-  
+    if (!access_token) {
+      console.log("Token de acesso não encontrado");
+      return res.redirect('/login'); // Redireciona para o login se o token não estiver presente
+    }
+
+    const response = await axios.delete(
+      `http://localhost:3000/nota/editar/${req.params.id}`,
+      {
+        headers: {
+          Authorization: `Bearer ${access_token}`
+        }
+      })
+
+  }catch(error){
+    console.error("Erro ao atualizar nota:");
+    return res.redirect('/');
+  }
+
   res.status(200).json({ success: true, message: `Tag com ID ${id} excluída com sucesso!` });
 });
 
@@ -251,12 +226,12 @@ app.post('/criarTag', async (req: Request, res: Response) => {
 
     if (!access_token) {
       console.log("Token de acesso não encontrado");
-      return await res.redirect('/login'); // Redireciona para o login se o token não estiver presente
+      return res.redirect('/login'); // Redireciona para o login se o token não estiver presente
     }
 
     const response = await axios.post(
       `http://localhost:3000/criarTag/`,
-      {tagColor, tagName},
+      { tagColor, tagName },
       {
         headers: {
           Authorization: `Bearer ${access_token}`
@@ -264,19 +239,19 @@ app.post('/criarTag', async (req: Request, res: Response) => {
       }
     )
     console.log("Tag criada com sucesso:", response.data);
-    return await res.redirect('/'); // Redireciona para a home após criar tag
+    return res.redirect('/'); // Redireciona para a home após criar tag
   } catch (error) {
     console.error("Erro ao criar tag:", error);
     return res.redirect('/'); // Redireciona para a home em caso de erro
   }
 })
 
-app.post('/excluirTag/:id', async(req: Request, res: Response) => {
+app.post('/excluirTag/:id', async (req: Request, res: Response) => {
   try {
     const access_token = req.cookies.acess_token
 
     if (!access_token) {
-      console.log("Token de acesso não encontrado");
+      console.log("Token de acesso não encontrado para excluir tag");
       return res.redirect('/login'); // Redireciona para o login se o token não estiver presente
     }
 
@@ -297,14 +272,31 @@ app.post('/excluirTag/:id', async(req: Request, res: Response) => {
 })
 
 app.post('/editarTag/:id', async (req: Request, res: Response) => {
-  const { id } = req.params; // Pegando o ID da URL
   const { titulo, cor } = req.body;
+  console.log("valores a serem editados aqui ->",titulo,cor)
+  try{
+    const access_token = req.cookies.acess_token
 
-  // Aqui você pode adicionar a lógica para editar a tag no banco de dados usando o `id`
-  console.log(`Tag com ID ${id} editada:`, { titulo, cor });
+    if (!access_token) {
+      console.log("Token de acesso não encontrado para excluir tag");
+      return res.redirect('/login'); // Redireciona para o login se o token não estiver presente
+    }
+
+    const response = await axios.delete(
+      `http://localhost:3000/excluirTag/${req.params.id}`,
+      {
+        headers: {
+          Authorization: `Bearer ${access_token}`
+        }
+      }
+    )
+
+  }catch(error){
+
+  }
 
   // Simulação de sucesso
-  res.status(200).json({ success: true, message: `Tag com ID ${id} editada com sucesso!` });
+  res.status(200).json({ success: true, message: `Tag com ID editada com sucesso!` });
 });
 
 // Iniciar o servidor
