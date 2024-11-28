@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="pt-br">
+
+<head>
+    <title>Tela Home</title>
+    <!-- Required meta tags -->
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+
+    <!-- Bootstrap CSS v5.2.1 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="../styles/style.css">
+    <style>
+
+    </style>
+</head>
+
+<body>
+    <nav class="navbar azulEscuro ">
+        <div class="container-fluid mx-2">
+            <a class="navbar-brand fs-2 text-white" href="#">
+                <img src="../images/Logo.png" alt="Logo" width="50" height="50" class="d-inline-block align-text-top">
+                TagMaster
+            </a>
+            <div>
+                <button type="button" class="btn btn-secondary text-white me-4 btn-lg" id="openPopupTags">TAGS</button>
+                <button type="button" class="btn btn-secondary text-white me-4 btn-lg"
+                    id="openPopupLixeira">LIXEIRA</button>
+                <button type="button" class="btn btn-secondary  text-white me-4 btn-lg">ENTRAR</button>
+            </div>
+        </div>
+    </nav>
+    <main class="container">
+        <div class="table-container">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <button class="btn bg-primary text-white fw-bold" id="openPopupCriarNota">+ Criar Nota</button>
+                <div class="w-50 d-flex align-items-center">
+                    <button class="btn btn-custom btn-filter me-3 d-flex align-items-center"
+                        id="openPopupFiltrarNota">Filtrar
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                            class="bi bi-funnel ms-2" viewBox="0 0 16 16">
+                            <path
+                                d="M1.5 1.5A.5.5 0 0 1 2 1h12a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-.128.334L10 8.692V13.5a.5.5 0 0 1-.342.474l-3 1A.5.5 0 0 1 6 14.5V8.692L1.628 3.834A.5.5 0 0 1 1.5 3.5zm1 .5v1.308l4.372 4.858A.5.5 0 0 1 7 8.5v5.306l2-.666V8.5a.5.5 0 0 1 .128-.334L13.5 3.308V2z" />
+                        </svg></button>
+                    <input type="text" class="form-control text-white"
+                        placeholder="Buscar termos em títulos e descrições">
+                </div>
+            </div>
+            <table class="table table-dark table-bordered table-hover align-middle">
+                <thead>
+                    <tr>
+                        <th scope="col">Título</th>
+                        <th scope="col">Descrição</th>
+                        <th scope="col">Tags</th>
+                        <th scope="col">Data</th>
+                        <th scope="col">Ações</th>
+                    </tr>
+                </thead>
+                <% notas.forEach(nota=> { %>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <%= nota.titulo %>
+                            </td>
+                            <td>
+                                <%= nota.desc %>
+                            </td>
+                            <td>
+                                <% if (nota.tags && nota.tags.length) { %>
+                                    <% nota.tags.forEach(tag=> { %>
+                                        <% if (tag) { %>
+                                            <span class=" tag " style="background-color: <%= tag.cor %>; color: white;">
+                                                <%= tag.titulo %>
+                                            </span>
+                                            <% } %>
+                                                <% }) %>
+                                                    <% } else { %>
+                                                        <p>Sem tags disponíveis.</p>
+                                                        <% } %>
+
+                            </td>
+                            <td>
+                                <%= new Date(nota.data).toLocaleDateString() %>
+                            </td>
+                            <td class="action-icons">
+                                <!-- Ícone de lápis -->
+                                <button class="btn btn-primary me-1" id="openPopupeEditar" onclick="editarNota(<%= nota.id %>, '<%= nota.titulo %>','<%= nota.desc %>','<%= new Date(nota.data).toLocaleDateString('en-CA').replace(/\//g, '-') %>' )">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+
+                                <!-- Ícone de lixeira -->
+                                <button class="btn btn-danger me-1 my-1" id="openPopupExcluir">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                        class="bi bi-trash3" viewBox="0 0 16 16">
+                                        <path
+                                            d="M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5M11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3A1.5 1.5 0 0 0 5 1.5v1H1.5a.5.5 0 0 0 0 1h.538l.853 10.66A2 2 0 0 0 4.885 16h6.23a2 2 0 0 0 1.994-1.84l.853-10.66h.538a.5.5 0 0 0 0-1zm1.958 1-.846 10.58a1 1 0 0 1-.997.92h-6.23a1 1 0 0 1-.997-.92L3.042 3.5zm-7.487 1a.5.5 0 0 1 .528.47l.5 8.5a.5.5 0 0 1-.998.06L5 5.03a.5.5 0 0 1 .47-.53Zm5.058 0a.5.5 0 0 1 .47.53l-.5 8.5a.5.5 0 1 1-.998-.06l.5-8.5a.5.5 0 0 1 .528-.47M8 4.5a.5.5 0 0 1 .5.5v8.5a.5.5 0 0 1-1 0V5a.5.5 0 0 1 .5-.5" />
+                                    </svg>
+                                </button>
+
+                                <!-- Ícone de olho -->
+                                <button class="btn btn-secondary" id="openPopupeVisualizar">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                        class="bi bi-eye" viewBox="0 0 16 16">
+                                        <path
+                                            d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8M1.173 8a13 13 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5s3.879 1.168 5.168 2.457A13 13 0 0 1 14.828 8q-.086.13-.195.288c-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5s-3.879-1.168-5.168-2.457A13 13 0 0 1 1.172 8z" />
+                                        <path
+                                            d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5M4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0" />
+                                    </svg>
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                    <% }); %>
+            </table>
+        </div>
+
+    </main>
+    <div class="overlay" id="overlay">
+        <div class="popup position-relative rounded-3 overflow-hidden">
+            
+        </div>
+    </div>
+
+    <!-- Bootstrap JavaScript Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+        integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
+        crossorigin="anonymous"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"
+        integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+"
+        crossorigin="anonymous"></script>
+    <script src="../javascript/javascript.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,175 @@
+body {
+    background-color: #000f2a;
+}
+
+.azulEscuro {
+    background-color: #001F58;
+    color: white;
+    font-weight: 600;
+    transition-duration: 0.3s;
+}
+
+.azulEscuro:hover {
+    background-color: #001F58;
+    color: white;
+    font-weight: 600;
+    transition-duration: 0.3s;
+}
+
+.table-container {
+    margin: 50px auto;
+    width: 90%;
+    max-width: 1200px;
+    background-color: #2a2a2a;
+    border-radius: 8px;
+    padding: 20px;
+}
+
+.btn-custom {
+    font-weight: bold;
+}
+
+.btn-create {
+    background-color: #ffffff;
+    color: #000000;
+}
+
+.btn-create:hover {
+    background-color: #f1f1f1;
+}
+
+.btn-filter {
+    background-color: #343a40;
+    color: #ffffff;
+}
+
+.btn-filter:hover {
+    background-color: #495057;
+}
+
+.form-control {
+    background-color: #2a2a2a;
+    color: white;
+    border: 1px solid #444;
+}
+
+.form-control:focus {
+    background-color: #2a2a2a;
+    border-color: #ffffff;
+    box-shadow: none;
+}
+
+.tag {
+    padding: 2px 8px;
+    border-radius: 5px;
+    font-size: 12px;
+}
+
+.tag-faculdade {
+    background-color: #007bff;
+    color: white;
+}
+
+.tag-urgente {
+    background-color: #dc3545;
+    color: white;
+}
+
+.action-icons i {
+    cursor: pointer;
+    margin: 0 5px;
+    font-size: 18px;
+}
+
+.action-icons i:hover {
+    opacity: 0.8;
+}
+
+.icon-edit {
+    color: #ffc107;
+}
+
+.icon-delete {
+    color: #dc3545;
+}
+
+.icon-view {
+    color: #28a745;
+}
+
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.4);
+    /* Opacidade e fundo escuro */
+    backdrop-filter: blur(10px);
+    /* Aplica o efeito de blur */
+    display: none;
+    /* Oculto por padrão */
+    justify-content: center;
+    align-items: center;
+    z-index: 10;
+    /* Garante que esteja acima de outros elementos */
+    
+}
+
+/* Popup */
+.popup {
+    background-color: rgb(210, 210, 210);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    width: 545px;
+    max-width: 90%;
+}
+
+/* Botão fechar */
+.close-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: transparent;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+    
+}
+
+.close-btn:hover {
+    color: red;
+}
+
+.login-container {
+    min-width: 30vw;
+    background: #D9D9D9;
+    padding: 2rem;
+    border-radius: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.login-logo {
+    display: flex;
+    /* Torna o contêiner flexível */
+    justify-content: center;
+    /* Centraliza horizontalmente */
+    align-items: center;
+    /* Centraliza verticalmente (se necessário) */
+}
+
+.login-logo img {
+    max-width: 250px;
+    margin-bottom: 1.5rem;
+}
+
+input::placeholder {
+    color: #ffffff !important;
+    /* Altere para a cor desejada */
+    opacity: 1;
+    /* Controle de opacidade, se necessário */
+}
+
+/* Placeholder para navegadores compatíveis antigos */
+input::-webkit-input-placeholder {
+    color: #ffffff !important;
+}
