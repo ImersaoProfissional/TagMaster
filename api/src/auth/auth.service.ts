@@ -49,7 +49,7 @@
         async verifyEmailToken(token: string): Promise<boolean> {
             try {
                 const decoded = await this.jwtService.verifyAsync(token);
-                console.log("Olha o email que veio: ", decoded.email);
+                console.log("Olha o email que veio: ", decoded.email); // excluir
                 const user = await this.userService.findUserBy({email: decoded.email});
                 if(!user) {
                     throw new UnauthorizedException('Token invalido!');

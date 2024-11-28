@@ -5,7 +5,7 @@ import { UserService } from 'src/user/user.service';
 import { IS_PUBLIC_KEY } from './public.Dec';
 import { Request } from 'express';
 import { jwtConstants } from './jwtConstants';
-import { ActivityMiddleware } from './auth.middleware';
+import { ActivityMiddleware } from '../auth.middleware';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -31,12 +31,13 @@ export class AuthGuard implements CanActivate {
     
     const request = context.switchToHttp().getRequest();
     const token = this.extractTokenFromHeader(request);
-    if (!token)
-      throw new UnauthorizedException('Token não fornecido');
     
     if (ActivityMiddleware.isTokenBlacklisted(token)) {
-      throw new Error('Sessão expirada. Faça login novamente.');
+      throw new UnauthorizedException('Sessão expirada. Faça login novamente.');
     }
+
+    if (!token)
+      throw new UnauthorizedException('Token não fornecido');
     
     try {
       const payload: { sub: number } = await this.jwtService.verifyAsync(
@@ -45,13 +46,14 @@ export class AuthGuard implements CanActivate {
           secret: jwtConstants.secret
         }
       );
-      request['user'] = this.userService.findUserBy({ id: payload.sub });
+      request['user'] = await this.userService.findUserBy({ id: payload.sub });
     } catch {
       throw new UnauthorizedException("Token inválido");
     }
 
     return true;
   }
+
 
   private extractTokenFromHeader(req: Request): string | undefined {
     const authorizationHeader = req.headers.authorization;

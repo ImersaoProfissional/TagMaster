@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
-import { UserModule } from 'src/user/user.module';  // Certifique-se de importar o UserModule corretamente
+import { UserModule } from 'src/user/user.module';
 import { JwtModule } from '@nestjs/jwt';
 import { jwtConstants } from './jwtConstants';
 import { UserService } from 'src/user/user.service';
@@ -14,7 +14,7 @@ import { User } from 'src/user/user.entity';
 
 @Module({
   imports: [
-    UserModule,  // O UserModule deve ser importado para acessar o UserService e o UserRepository
+    UserModule,
     JwtModule.register({
       secret: jwtConstants.secret,
       signOptions: { expiresIn: '1d' },
@@ -29,7 +29,7 @@ import { User } from 'src/user/user.entity';
     PasswordService,
     {
       provide: APP_GUARD,
-      useClass: AuthGuard,
+      useClass: AuthGuard,  // Aplica o guard globalmente
     },
   ],
   exports: [AuthService, PasswordService],

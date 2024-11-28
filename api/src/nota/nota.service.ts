@@ -92,7 +92,6 @@ export class NotaService {
             throw new NotFoundException("Nenhum id de notas está sendo achado")
 
         console.log("OLHA EU", notasComTags); // excluir
-        notasComTags.forEach(nota => {nota.tags.forEach(tag=> {console.log(tag.titulo)})}); // excluir
         return notasComTags;
     }
 
