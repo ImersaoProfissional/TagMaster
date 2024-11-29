@@ -595,17 +595,39 @@ function ordenarNotasPorData(notas, tags) {
 
 function filtrarPorTags(notas, tags) {
 
-  
   return notas.filter((nota) => {
     // Verifica se a nota contém todas as tags obrigatórias
     const tagsObrigatorias = tags.obrigatorias;
     const tagsOpcionais = tags.opcionais;
+    const tagsSelecionadas = tags.obrigatorias.length > 0 && tags.opcionais.length === 0 ? 'obrigatoria' :
+    tags.obrigatorias.length > 0 && tags.opcionais.length > 0 ? 'todas': null ;
 
+    if(tagsSelecionadas === 'obrigatoria'){
+   
       const temTagsObrigatorias = tagsObrigatorias.every(
         (tagId) =>
           nota.tags.some((tag) => String(tag.id) === String(tagId)) &&
         nota.tags.length === tagsObrigatorias.length
       );
       return temTagsObrigatorias;
-  });
+    }
+    else if (tagsSelecionadas === 'todas'){
+      const temTagsObrigatorias = tagsObrigatorias.every(
+        (tagId) =>
+          nota.tags.some((tag) => String(tag.id) === String(tagId))
+      );
+      
+      const temTagsOpcionais =
+        tagsOpcionais.length === 0 || // Se não houver tags opcionais selecionadas
+        tagsOpcionais.some((tagId) =>
+          nota.tags.some((tag) => String(tag.id) === String(tagId))
+        );
+            
+      // Verifica se a nota tem as tags obrigatórias e, se houver tags opcionais selecionadas,
+      // ela pode ou não ter uma tag opcional.
+      return temTagsObrigatorias && (tagsOpcionais.length === 0 || temTagsOpcionais);
+    }
+
+    });
+    
 }
