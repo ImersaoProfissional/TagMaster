@@ -24,11 +24,16 @@
                 throw new UnauthorizedException('Email ou senha incorretos');
             }
 
-            const { id: sub, email } = user;
-            console.log("ID/SUB: ",sub, "IMEI", email) // excluir
+
+            const payload = {
+                sub : user.id,
+                email : user.email,
+                temp : false
+            };
+            // console.log("ID/SUB: ",sub, "IMEI", email); // excluir
 
             return {
-                access_token: await this.jwtService.signAsync({ sub, email }),
+                access_token: await this.jwtService.signAsync({sub: payload.sub, email: payload.email}),
             };
         }
 

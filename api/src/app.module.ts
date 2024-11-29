@@ -1,4 +1,4 @@
-import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule, RequestMethod } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { NotaModule } from './nota/nota.module';
@@ -7,10 +7,11 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module';
 import { MailerModule } from './mailer/mailer.module';
 import { TagsModule } from './tags/tags.module';
-import { ActivityMiddleware } from './auth.middleware';  // Middleware de atividade
 import { User } from './user/user.entity';
 import { Nota } from './nota/nota.entity';
 import { Tags } from './tags/tags.entity';
+import { AuthGuard } from './auth/auth.guard';
+import { APP_GUARD,  } from '@nestjs/core';
 
 @Module({
   imports: [
@@ -31,14 +32,12 @@ import { Tags } from './tags/tags.entity';
     TagsModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService,
+    {
+      provide: APP_GUARD,
+      useClass: AuthGuard, // Aplica o AuthGuard globalmente
+    },
+  ],
 })
-export class AppModule implements NestModule {
-  configure(consumer: MiddlewareConsumer) {
-    console.log('Middleware sendo EXECUTADO!!!');
-    consumer
-      .apply(ActivityMiddleware)  // Aplica o middleware de atividade
-      .exclude('/auth/*')          // Exclui as rotas de autenticação, já protegidas pelo AuthGuard
-      .forRoutes('*');             // Aplica o middleware para todas as outras rotas
-  }
+export class AppModule{
 }

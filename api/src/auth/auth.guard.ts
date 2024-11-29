@@ -5,7 +5,6 @@ import { UserService } from 'src/user/user.service';
 import { IS_PUBLIC_KEY } from './public.Dec';
 import { Request } from 'express';
 import { jwtConstants } from './jwtConstants';
-import { ActivityMiddleware } from '../auth.middleware';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -32,9 +31,6 @@ export class AuthGuard implements CanActivate {
     const request = context.switchToHttp().getRequest();
     const token = this.extractTokenFromHeader(request);
     
-    if (ActivityMiddleware.isTokenBlacklisted(token)) {
-      throw new UnauthorizedException('Sessão expirada. Faça login novamente.');
-    }
 
     if (!token)
       throw new UnauthorizedException('Token não fornecido');
@@ -46,7 +42,8 @@ export class AuthGuard implements CanActivate {
           secret: jwtConstants.secret
         }
       );
-      request['user'] = await this.userService.findUserBy({ id: payload.sub });
+      const user = await this.userService.findUserBy({ id: payload.sub });
+      request['user'] = user;   
     } catch {
       throw new UnauthorizedException("Token inválido");
     }

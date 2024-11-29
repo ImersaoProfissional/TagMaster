@@ -54,7 +54,7 @@ app.post('/login', async (req: Request, res: Response) => {
       password
     });
 
-    console.log(response)
+    
 
     const { access_token } = response.data;
 
@@ -124,7 +124,6 @@ app.get('/', async (req: Request, res: Response) => {
       headers: { Authorization: `Bearer ${access_token}` },
     });
 
-    console.log(notas, "Tags Aq -> ", tags.data)
 
     return res.render('home', { notas: notas.data, tags: tags.data });// Renderiza a página com as notas retornadas
   } catch (error) {
@@ -137,13 +136,6 @@ app.get('/', async (req: Request, res: Response) => {
 // Funcionando
 app.post('/criarNota', async (req: Request, res: Response) => {
   const { titulo, conteudo, tags } = req.body;
-
-  // Converte o array de strings em inteiros, filtrando valores inválidos
-  const tagsConvertidas = tags
-    .map(tag => parseInt(tag, 10)) // Converte cada elemento para número inteiro
-    .filter(Number.isInteger);    // Remove valores que não são inteiros
-
-  
 
 
   try {
@@ -166,7 +158,7 @@ app.post('/criarNota', async (req: Request, res: Response) => {
       }
     );
 
-    console.log(tagsConvertidas); // Exemplo: [1, 2, 3]
+    // console.log(tagsConvertidas); // Exemplo: [1, 2, 3]
     return res.redirect('/'); // Redireciona para a home após criar a nota
   } catch (error) {
     console.error("Erro ao criar nota:", error);
@@ -293,7 +285,7 @@ app.post('/editarTag/:id', async (req: Request, res: Response) => {
       return res.redirect('/login'); // Redireciona para o login se o token não estiver presente
     }
 
-    console.log('Breakpoint: dados ->', cor, titulo)
+    console.log('Breakpoint: dados ->', cor, titulo) // não sei
 
     const response = await axios.put(
       `http://localhost:3000/tags/editar/${req.params.id}`,

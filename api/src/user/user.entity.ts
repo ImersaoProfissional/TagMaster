@@ -16,8 +16,8 @@ export class User {
     @Column()
     password: string
 
-    @Column({ default: true })
-    isActive: boolean;
+    @Column({ default: false })
+    temp: boolean;
 
     @Column({ default: false })
     isEmailActive: boolean

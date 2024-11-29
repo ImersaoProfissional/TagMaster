@@ -30,8 +30,22 @@ export class UserService {
         this.userRepository.save(response);
         console.log(response);
     
-        console.log("Usuario cadastrado!")
+        console.log("Usuario cadastrado!") // excluir
         return "Usuario foi criado com sucesso!!";
+    }
+
+    async createTempUser(userTemp: {id, email, nome, temp}){
+
+        const response = this.userRepository.create({
+            id : userTemp.id,
+            name: userTemp.nome,
+            email: userTemp.email,
+            password: '',
+            temp: userTemp.temp,
+        })
+
+        return this.userRepository.save(response);
+
     }
     
     

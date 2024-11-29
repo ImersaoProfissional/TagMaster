@@ -20,10 +20,12 @@ export class NotaService {
         if (!notaDto)
             throw new UnauthorizedException("Nota não foi passada corretamente")
 
+        console.log(notaDto.tags)
+
         const dataNow = notaDto.data ? notaDto.data : new Date(Date.now())
 
-        if (notaDto.tagId) {
-            const tag = await this.tagsService.findAllTagsById(notaDto.tagId)
+        if (notaDto.tags) {
+            const tag = await this.tagsService.findAllTagsById(notaDto.tags)
 
             const notaCriada = await this.notaRepository.create({
                 titulo: notaDto.titulo,
@@ -45,8 +47,8 @@ export class NotaService {
         return this.notaRepository.save(notaCriada);
 
     }
-    
-    async findAllNotaBy(notaFind: { titulo?: string; desc?: string}): Promise<Nota[]> {
+
+    async findAllNotaBy(notaFind: { titulo?: string; desc?: string }): Promise<Nota[]> {
         const { titulo, desc } = notaFind;
         if (!desc && !titulo)
             throw new UnauthorizedException("titulo ou descrição não foram passados");
@@ -54,7 +56,7 @@ export class NotaService {
         const nota =
             titulo ? await this.notaRepository.findBy({ titulo: titulo }) // se o titulo for passado ele pesquisa por titulo 
                 : desc ? await this.notaRepository.findBy({ desc: desc })
-                        : null; // caso nenhum dos dois seja passado ele será nulo
+                    : null; // caso nenhum dos dois seja passado ele será nulo
 
         if (!nota || nota === null)
             throw new NotFoundException("Nota não encontrada");
@@ -85,13 +87,12 @@ export class NotaService {
         const userComNotasSemTags = await this.userService.puxarNotas(user);
 
         const notasComTags = await this.notaRepository.find({
-            where : { users: { id : userComNotasSemTags.id} },
+            where: { users: { id: userComNotasSemTags.id }, isActive: true },
         });
 
         if (!notasComTags)
             throw new NotFoundException("Nenhum id de notas está sendo achado")
 
-        console.log("OLHA EU", notasComTags); // excluir
         return notasComTags;
     }
 
@@ -100,6 +101,10 @@ export class NotaService {
         const userComNotas = await this.userService.puxarNotasDesativadas(user);
         if (!userComNotas)
             throw new NotFoundException("Nenhum id de notas está sendo achado")
+
+        const notasDesativadas = await this.notaRepository.find({
+            where: { users: { id: userComNotas.id }, isActive: false }
+        })
 
         console.log("OLHA EU", userComNotas.notas); // excluir
         return userComNotas.notas;
@@ -126,7 +131,7 @@ export class NotaService {
             ...(notaEditDto.titulo && { titulo: notaEditDto.titulo }),
             ...(notaEditDto.desc && { desc: notaEditDto.desc }),
             ...(notaEditDto.data && { data: notaEditDto.data }),
-            ...(notaEditDto.tagId && { tags: await this.tagsService.findAllTagsById(notaEditDto.tagId) }),
+            ...(notaEditDto.tags && { tags: await this.tagsService.findAllTagsById(notaEditDto.tags) }),
         };
 
         return this.notaRepository.save(notaToEdit);

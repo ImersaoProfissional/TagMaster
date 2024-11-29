@@ -27,11 +27,8 @@ import { User } from 'src/user/user.entity';
     UserService,
     MailerService,
     PasswordService,
-    {
-      provide: APP_GUARD,
-      useClass: AuthGuard,  // Aplica o guard globalmente
-    },
   ],
-  exports: [AuthService, PasswordService],
+  exports: [AuthService, PasswordService, JwtModule],
 })
-export class AuthModule {}
+export class AuthModule {
+}

@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, Request } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Request, UseInterceptors } from '@nestjs/common';
 import { NotaService } from './nota.service';
 import { EditNotaDTO, NotaDTO } from './DTO/nota.dto';
 
@@ -12,6 +12,9 @@ export class NotaController {
     @Post('criar')
     async criarNotaUser(@Body() notaDto: NotaDTO, @Request() req: Request) {
         const user = await req['user'];
+
+        console.log('Controller ->', notaDto.tags);
+        
         return this.notaService.createNota(notaDto, user);
     }
 

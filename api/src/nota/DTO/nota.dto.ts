@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString } from "class-validator";
+import { IsNotEmpty, IsNumber, IsString } from "class-validator";
 
 export class NotaDTO {
     @IsNotEmpty()
@@ -10,8 +10,8 @@ export class NotaDTO {
     desc: string
 
     data?: Date;
-
-    tagId?: number[]
+    @IsNumber()
+    tags?: number[]
 }
 
 export class EditNotaDTO {
@@ -21,5 +21,5 @@ export class EditNotaDTO {
 
     data?: Date;
 
-    tagId?: number[]
+    tags?: number[]
 }

@@ -1,4 +1,4 @@
-import { forwardRef, Module } from '@nestjs/common';
+import { forwardRef, MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { NotaService } from './nota.service';
 import { NotaController } from './nota.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -16,4 +16,5 @@ import { TagsModule } from 'src/tags/tags.module';
   controllers: [NotaController],
   exports: [NotaService],
 })
-export class NotaModule { }
+export class NotaModule { 
+}
