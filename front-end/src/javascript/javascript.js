@@ -31,9 +31,15 @@ function criarTag() {
         },
         body: JSON.stringify({ tagName, tagColor }), // Envia os dados no corpo da requisição
     })
+    fetch('http://localhost:3001/', {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+        }
+    })
+    fecharPopup()
 
 }
-
 // Funcionando
 function editarTag(id) {
     const titulo = document.getElementById("texto").value;
@@ -55,18 +61,19 @@ function editarTag(id) {
         },
         body: JSON.stringify({ titulo, cor }), // Envia os dados no corpo da requisição
     })
-    .then(response => response.json()) // Espera pela resposta e a converte para JSON
-    .then(data => {
-        if (data.success) {
-            alert("Tag editada com sucesso!");
-        } else {
-            alert("Falha ao editar tag.");
-        }
-    })
-    .catch(error => {
-        console.error('Erro:', error);
-        alert("Ocorreu um erro ao editar a tag.");
-    });
+        .then(response => response.json()) // Espera pela resposta e a converte para JSON
+        .then(data => {
+            if (data.success) {
+                alert("Tag editada com sucesso!");
+            } else {
+                alert("Falha ao editar tag.");
+            }
+        })
+        .catch(error => {
+            console.error('Erro:', error);
+            alert("Ocorreu um erro ao editar a tag.");
+        });
+    fecharPopup()
 }
 // Funcionando
 function excluirTag(id) {
@@ -79,24 +86,25 @@ function excluirTag(id) {
             'Content-Type': 'application/json',
         },
     })
-    .then(response => response.json()) // Espera pela resposta e a converte para JSON
-    .then(data => {
-        if (data.success) {
-            alert("Tag excluída com sucesso!");
-        } else {
-            alert("Falha ao excluir tag.");
-        }
-    })
-    .catch(error => {
-        console.error('Erro:', error);
-        alert("Ocorreu um erro ao excluir a tag.");
-    });
+        .then(response => response.json()) // Espera pela resposta e a converte para JSON
+        .then(data => {
+            if (data.success) {
+                alert("Tag excluída com sucesso!");
+            } else {
+                alert("Falha ao excluir tag.");
+            }
+        })
+        .catch(error => {
+            console.error('Erro:', error);
+            alert("Ocorreu um erro ao excluir a tag.");
+        });
+    fecharPopup()
 }
-// Funcionando
-function editarNota(id, titulo, desc, data){
+// Funcionando  --> falta mostrar tags
+function editarNota(id, titulo, desc, data) {
     overlay.style.display = 'flex';
     const popup = document.querySelector('.popup'); // Certifique-se de que o seletor corresponde ao elemento correto
-    console.log(id,titulo,desc,data)
+    console.log(id, titulo, desc, data)
     if (popup) {
         popup.innerHTML = `
              <h1 class="fs-1 text- azulEscuro text-white p-2 fw-bold">Editar Nota</h1>
@@ -140,56 +148,95 @@ function editarNota(id, titulo, desc, data){
     }
 }
 // Funcionando
-openPopupCriarNota.addEventListener('click', () => {
-    overlay.style.display = 'flex'; // Exibe o overlay e o popup
+function abrirPopupExcluirNota(id) {
 
-    // Obtendo o elemento popup corretamente
+    overlay.style.display = 'flex';
     const popup = document.querySelector('.popup'); // Certifique-se de que o seletor corresponde ao elemento correto
 
-
     if (popup) {
-        popup.innerHTML = `
-        <h1 class="fs-1 text- azulEscuro text-white p-2 fw-bold">Criar Nota</h1>
-        <form id="formCriarNota" method="post" action="http://localhost:3001/criarNota">
-            <div class="mb-1 p-2 mt-5">
-                <label for="text" class="form-label fs-6 fw-bold">Título</label>
-                <input type="text" class="form-control bg-secondary text-white" id="text" name="titulo" required>
+        popup.innerHTML = `<div class="container p-3 text-center">
+            <h4 class="mb-5">Deseja realmente excluir essa nota?</h4>
+            <div class="d-flex justify-content-between mb-3 p-2 mx-5">
+                <button type="button" class="btn btn-danger " onClick="fecharPopup()">CANCELAR</button>
+                <button type="submit" class="btn azulEscuro pe-5 ps-5" onclick="excluirNota(${id})">SIM</button>
             </div>
-            <div class="mb-1 p-2">
-                <label for="exampleFormControlTextarea1" class="form-label fs-6 fw-bold">Conteúdo</label>
-                <textarea class="form-control bg-secondary text-white" id="exampleFormControlTextarea1" name="conteudo" rows="7" required></textarea>
-            </div>
-            <div class="p-2 mb-3">
-                <label for="tags" class="form-label fs-6 fw-bold">Tags</label>
-                <br>
-                <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="checkbox" id="inlineCheckbox1" name="tags" value="faculdade">
-                    <label class="form-check-label tag tag-faculdade" for="inlineCheckbox1">Faculdade</label>
-                </div>
-                <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="checkbox" id="inlineCheckbox2" name="tags" value="urgente">
-                    <label class="form-check-label tag tag-urgente" for="inlineCheckbox2">Urgente</label>
-                </div>
-                <button type="button" class="btn btn-outline-secondary tag">+ Adicionar Tag</button>
-            </div>
-            <div class="d-flex justify-content-between mb-3 p-2">
-                <button type="button" class="btn btn-danger mb-3" id="closePopup" onClick='fecharPopup()'>Cancelar</button>
-                <button type="submit" class="btn azulEscuro">Confirmar</button>
-            </div>
-        </form>
-    `;
+        </div>`
     }
-});
+
+}
 // Funcionando
-openPopupTags.addEventListener('click', () => {
+function excluirNota(id) {
+    fetch(`http://localhost:3001/excluirNota/${id}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    }).then((response) => {
+        if (response.ok) {
+            fecharPopup();
+            alert("Nota excluída com sucesso");
+        } else {
+            alert("Erro ao excluir a nota");
+        }
+    })
+}
+// Funcionando -> falta mostrar tags
+function visualizarNota(id, titulo, desc, data) {
+    overlay.style.display = 'flex';
+    const popup = document.querySelector('.popup'); // Certifique-se de que o seletor corresponde ao elemento correto
+    console.log(id, titulo, desc, data)
+    if (popup) {
+        popup.innerHTML = `
+             <h1 class="fs-1 text- azulEscuro text-white p-2 fw-bold">Editar Nota</h1>
+            <form id="formCriarNota" method="post" action="http://localhost:3001/editarNota/${id}">
+                <div class="mb-1 p-2 mt-5">
+                    <label for="text" class="form-label fs-6 fw-bold">Título</label>
+                    <input type="text" class="form-control bg-secondary text-white" id="text" name="titulo"
+                        value="${titulo}" disabled>
+                </div>
+                <div class="mb-1 p-2">
+                    <label for="exampleFormControlTextarea1" class="form-label fs-6 fw-bold">Conteúdo</label>
+                    <textarea class="form-control bg-secondary text-white" id="exampleFormControlTextarea1"
+                        name="conteudo" rows="7" disabled>${desc}</textarea>
+                </div>
+
+                <div class="mb-1 p-2">
+                    <label for="data" class="form-label fs-6 fw-bold">Data</label>
+                    <input type="date" class="form-control bg-secondary text-white" id="data" name="data"
+                        value="${data}" disabled>
+                </div>
+                <div class="p-2 mb-3">
+                    <label for="tags" class="form-label fs-6 fw-bold">Tags</label>
+                    <br>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" id="inlineCheckbox1" name="tags"
+                            value="faculdade" checked disabled>
+                        <label class="form-check-label tag tag-faculdade" for="inlineCheckbox1">Faculdade</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" id="inlineCheckbox2" name="tags" value="urgente"
+                            checked disabled>
+                        <label class="form-check-label tag tag-urgente" for="inlineCheckbox2">Urgente</label>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-between mb-3 p-2">
+                    <button type="button" class="btn btn-danger mb-3" onClick='fecharPopup()'>Voltar</button>
+                </div>
+            </form>
+        `;
+    }
+}
+
+function abrirPopupTags(tags) {
     overlay.style.display = 'flex'; // Exibe o overlay e o popup
 
     const popup = document.querySelector('.popup'); // Certifique-se de que o seletor corresponde ao elemento correto
 
+    console.log("Dados de tags aqui--> ", tags);
+
     if (popup) {
         popup.innerHTML = `
-          <h1 class="fs-1 text-white p-4 fw-bold text-center" style="background-color: #003366;">Tags</h1>
-
+            <h1 class="fs-1 text-white p-4 fw-bold text-center" style="background-color: #003366;">Tags</h1>
             <!-- Container -->
             <div class="container mt-4">
                 <!-- Botão para Criar Tag -->
@@ -217,24 +264,68 @@ openPopupTags.addEventListener('click', () => {
                         </tr>
                     </thead>
                     <tbody id="tags-list">
-                        <tr>
-                            <td>Fazer AEP</td>
-                            <td>
-                                <input type="color" name="cor" id="cor" class="form-control" disabled>
-                            </td>
-                            <td>
-                                <button class="btn btn-warning btn-sm" onclick="editarTag(1)">Editar</button>
-                                <button class="btn btn-danger btn-sm" onclick="excluirTag(1)">Excluir</button>
-                            </td>
-                        </tr>
+                        ${tags.map(tag => `
+                            <tr>
+                                <td>${tag.titulo}</td>
+                                <td>
+                                    <input type="color" name="cor" class="form-control" value="${tag.cor}" disabled>
+                                </td>
+                                <td>
+                                    <button class="btn btn-warning btn-sm" onclick="editarTag(${tag.id})">Editar</button>
+                                    <button class="btn btn-danger btn-sm" onclick="excluirTag(${tag.id})">Excluir</button>
+                                </td>
+                            </tr>
+                        `).join('')}
                     </tbody>
                 </table>
                 <button type="button" class="btn btn-danger mb-3" id="closePopup" onClick='fecharPopup()'>Voltar</button>
             </div>
-
         `;
     }
-});
+}
+
+function openPopupCriarNotas(tags) {
+    overlay.style.display = 'flex'; // Exibe o overlay e o popup
+    console.log("Dados de tags aqui--> ", tags);
+    // Obtendo o elemento popup corretamente
+    const popup = document.querySelector('.popup'); // Certifique-se de que o seletor corresponde ao elemento correto
+
+
+    if (popup) {
+        popup.innerHTML = `
+        <h1 class="fs-1 text- azulEscuro text-white p-2 fw-bold">Criar Nota</h1>
+        <form id="formCriarNota" method="post" action="http://localhost:3001/criarNota">
+            <div class="mb-1 p-2 mt-5">
+                <label for="text" class="form-label fs-6 fw-bold">Título</label>
+                <input type="text" class="form-control bg-secondary text-white" id="text" name="titulo" required>
+            </div>
+            <div class="mb-1 p-2">
+                <label for="exampleFormControlTextarea1" class="form-label fs-6 fw-bold">Conteúdo</label>
+                <textarea class="form-control bg-secondary text-white" id="exampleFormControlTextarea1" name="conteudo" rows="7" required></textarea>
+            </div>
+            <div class="p-2 mb-3">
+                <label for="tags" class="form-label fs-6 fw-bold">Tags</label>
+                <br>
+                ${tags.map(tag => `
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" id="inlineCheckbox1" name="tags" value="${tag.id}">
+                    <label class="form-check-label tag text-white" style="background-color: ${tag.cor};" for="inlineCheckbox1">
+                        ${tag.titulo}
+                    </label>
+                </div>
+
+                `).join('')}
+                <button type="button" class="btn btn-outline-secondary tag">+ Adicionar Tag</button>
+            </div>
+            <div class="d-flex justify-content-between mb-3 p-2">
+                <button type="button" class="btn btn-danger mb-3" id="closePopup" onClick='fecharPopup()'>Cancelar</button>
+                <button type="submit" class="btn azulEscuro">Confirmar</button>
+            </div>
+        </form>
+    `;
+    }
+}
+
 
 openPopupFiltrarNota.addEventListener('click', () => {
     overlay.style.display = 'flex'; // Exibe o overlay e o popup
@@ -332,117 +423,15 @@ openPopupLixeira.addEventListener('click', () => {
     }
 });
 
-// openPopupeEditar.addEventListener('click', () => {
-//     overlay.style.display = 'flex';
-//     const popup = document.querySelector('.popup'); // Certifique-se de que o seletor corresponde ao elemento correto
 
-//     if (popup) {
-//         popup.innerHTML = `
-//         <h1 class="fs-1 text- azulEscuro text-white p-2 fw-bold">Editar Nota</h1>
-//         <form id="formCriarNota" method="post" action="http://localhost:3001/editarNota/1">
-//             <div class="mb-1 p-2 mt-5">
-//                 <label for="text" class="form-label fs-6 fw-bold">Título</label>
-//                 <input type="text" class="form-control bg-secondary text-white" id="text" name="titulo" value="Fazer AEP" required>
-//             </div>
-//             <div class="mb-1 p-2">
-//                 <label for="exampleFormControlTextarea1" class="form-label fs-6 fw-bold">Conteúdo</label>
-//                 <textarea class="form-control bg-secondary text-white" id="exampleFormControlTextarea1" name="conteudo" rows="7" required>Fazer vídeo da AEP para entregar 18/11</textarea>
-//             </div>
-//             <div class="mb-1 p-2">
-//                 <label for="data" class="form-label fs-6 fw-bold">Data</label>
-//                 <input type="date" class="form-control bg-secondary text-white" id="data" name="data" value="2024-11-14" required>
-//             </div>
-//             <div class="p-2 mb-3">
-//                 <label for="tags" class="form-label fs-6 fw-bold">Tags</label>
-//                 <br>
-//                 <div class="form-check form-check-inline">
-//                     <input class="form-check-input" type="checkbox" id="inlineCheckbox1" name="tags" value="faculdade" checked>
-//                     <label class="form-check-label tag tag-faculdade" for="inlineCheckbox1">Faculdade</label>
-//                 </div>
-//                 <div class="form-check form-check-inline">
-//                     <input class="form-check-input" type="checkbox" id="inlineCheckbox2" name="tags" value="urgente" checked>
-//                     <label class="form-check-label tag tag-urgente" for="inlineCheckbox2">Urgente</label>
-//                 </div>
-//             </div>
-//             <div class="d-flex justify-content-between mb-3 p-2">
-//                 <button type="button" class="btn btn-danger" id="closePopup">Cancelar</button>
-//                 <button type="submit" class="btn azulEscuro">Confirmar</button>
-//             </div>
-//         </form>
-//         `;
-//     }
-// });
-
-openPopupExcluir.addEventListener('click', () => {
-    overlay.style.display = 'flex';
-    const popup = document.querySelector('.popup'); // Certifique-se de que o seletor corresponde ao elemento correto
-
-    if (popup) {
-        popup.innerHTML = `
-            <div class="container p-3 text-center">
-                <h4 class="mb-5">Deseja realmente excluir essa nota?</h4>
-                <div class="d-flex justify-content-between mb-3 p-2 mx-5">
-                    <button type="button" class="btn btn-danger " id="closePopup">CANCELAR</button>
-                    <button type="submit" class="btn azulEscuro pe-5 ps-5">SIM</button>
-                </div>
-            </div>
-        `;
-    }
-});
-
-openPopupeVisualizar.addEventListener('click', () => {
-    overlay.style.display = 'flex';
-    const popup = document.querySelector('.popup'); // Certifique-se de que o seletor corresponde ao elemento correto
-
-    if (popup) {
-        popup.innerHTML = `
-            <h1 class="fs-1 text- azulEscuro text-white p-2 fw-bold">Visualizar</h1>
-            <div class="container">
-                <div class="mb-1 p-2 mt-5">
-                    <label for="text" class="form-label fs-6 fw-bold">Título</label>
-                    <input type="text" class="form-control bg-secondary text-white" id="text" name="titulo"
-                        value="Fazer AEP" readonly>
-                </div>
-                <div class="mb-1 p-2">
-                    <label for="exampleFormControlTextarea1" class="form-label fs-6 fw-bold">Conteúdo</label>
-                    <textarea class="form-control bg-secondary text-white" id="exampleFormControlTextarea1"
-                        name="conteudo" rows="7" readonly>Fazer vídeo da AEP para entregar 18/11</textarea>
-                </div>
-                <div class="mb-1 p-2">
-                    <label for="data" class="form-label fs-6 fw-bold">Data</label>
-                    <input type="date" class="form-control bg-secondary text-white" id="data" name="data"
-                        value="2024-11-14" readonly>
-                </div>
-                <div class="p-2 mb-3">
-                    <label for="tags" class="form-label fs-6 fw-bold">Tags</label>
-                    <br>
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="checkbox" id="inlineCheckbox1" name="tags"
-                            value="faculdade" checked disabled>
-                        <label class="form-check-label tag tag-faculdade" for="inlineCheckbox1">Faculdade</label>
-                    </div>
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="checkbox" id="inlineCheckbox2" name="tags" value="urgente"
-                            checked disabled>
-                        <label class="form-check-label tag tag-urgente" for="inlineCheckbox2">Urgente</label>
-                    </div>
-                </div>
-                <button type="button" class="btn azulEscuro mb-2 " id="closePopup">Voltar</button>
-            </div>
-        `;
-    }
-});
-
-// Fecha o popup
-
-function fecharPopup(){
+function fecharPopup() {
     overlay.style.display = 'none';
-        const popup = document.querySelector('.popup'); // Certifique-se de que o seletor corresponde ao elemento correto
+    const popup = document.querySelector('.popup'); // Certifique-se de que o seletor corresponde ao elemento correto
 
 
-        if (popup) {
-            popup.innerHTML = ``;
-        }
+    if (popup) {
+        popup.innerHTML = ``;
+    }
 }
 
 overlay.addEventListener('click', (event) => {

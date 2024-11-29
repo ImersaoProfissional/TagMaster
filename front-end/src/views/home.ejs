@@ -25,7 +25,7 @@
                 TagMaster
             </a>
             <div>
-                <button type="button" class="btn btn-secondary text-white me-4 btn-lg" id="openPopupTags">TAGS</button>
+                <button type="button" class="btn btn-secondary text-white me-4 btn-lg" onclick="abrirPopupTags(<%= JSON.stringify(tags) %>)">TAGS</button>
                 <button type="button" class="btn btn-secondary text-white me-4 btn-lg"
                     id="openPopupLixeira">LIXEIRA</button>
                 <button type="button" class="btn btn-secondary  text-white me-4 btn-lg">ENTRAR</button>
@@ -35,7 +35,7 @@
     <main class="container">
         <div class="table-container">
             <div class="d-flex justify-content-between align-items-center mb-3">
-                <button class="btn bg-primary text-white fw-bold" id="openPopupCriarNota">+ Criar Nota</button>
+                <button class="btn bg-primary text-white fw-bold" onclick="openPopupCriarNotas(<%= JSON.stringify(tags) %>)">+ Criar Nota</button>
                 <div class="w-50 d-flex align-items-center">
                     <button class="btn btn-custom btn-filter me-3 d-flex align-items-center"
                         id="openPopupFiltrarNota">Filtrar
@@ -75,10 +75,10 @@
                                                 <%= tag.titulo %>
                                             </span>
                                             <% } %>
-                                                <% }) %>
-                                                    <% } else { %>
-                                                        <p>Sem tags disponíveis.</p>
-                                                        <% } %>
+                                        <% }) %>
+                                    <% } else { %>
+                                        <p>Sem tags disponíveis.</p>
+                                <% } %>
 
                             </td>
                             <td>
@@ -91,7 +91,7 @@
                                 </button>
 
                                 <!-- Ícone de lixeira -->
-                                <button class="btn btn-danger me-1 my-1" id="openPopupExcluir">
+                                <button class="btn btn-danger me-1 my-1"  onclick="abrirPopupExcluirNota(<%= nota.id %>)">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                                         class="bi bi-trash3" viewBox="0 0 16 16">
                                         <path
@@ -100,7 +100,7 @@
                                 </button>
 
                                 <!-- Ícone de olho -->
-                                <button class="btn btn-secondary" id="openPopupeVisualizar">
+                                <button class="btn btn-secondary" onclick="visualizarNota(<%= nota.id %>, '<%= nota.titulo %>','<%= nota.desc %>','<%= new Date(nota.data).toLocaleDateString('en-CA').replace(/\//g, '-') %>' )">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                                         class="bi bi-eye" viewBox="0 0 16 16">
                                         <path

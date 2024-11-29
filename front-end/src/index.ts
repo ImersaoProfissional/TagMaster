@@ -88,7 +88,7 @@ app.post('/cadastro', async (req: Request, res: Response) => {
 
   try {
     // Envio para a API de criação de usuário
-    await axios.post("http://localhost:3000/user/cadastro", {
+    await axios.post("http://localhost:3000/auth/cadastro", {
       name,
       email,
       password,
@@ -116,18 +116,17 @@ app.get('/', async (req: Request, res: Response) => {
       return res.redirect('login');
     }
 
-    const [responseNotas] = await Promise.all([
-      axios.get('http://localhost:3000/nota', {
-        headers: { Authorization: `Bearer ${access_token}` },
-      }),
-      // axios.get('http://localhost:3000/tags', {
-      //   headers: { Authorization: `Bearer ${access_token}` },
-      // }),
-    ]);
-    
-    console.log(responseNotas.data);
-    
-    return res.render('home', { notas: responseNotas.data});// Renderiza a página com as notas retornadas
+    const notas = await axios.get('http://localhost:3000/nota', {
+      headers: { Authorization: `Bearer ${access_token}` },
+    });
+
+    const tags = await axios.get('http://localhost:3000/tags', {
+      headers: { Authorization: `Bearer ${access_token}` },
+    });
+
+    console.log(notas, "Tags Aq -> ", tags.data)
+
+    return res.render('home', { notas: notas.data, tags: tags.data });// Renderiza a página com as notas retornadas
   } catch (error) {
     console.error("Erro ao buscar notas");
     return res.render('home'); // Renderiza a página sem as notas, exibindo o erro (se necessário)
@@ -137,8 +136,16 @@ app.get('/', async (req: Request, res: Response) => {
 // CRUD Notas
 // Funcionando
 app.post('/criarNota', async (req: Request, res: Response) => {
-  const { titulo, conteudo, tag } = req.body;
-  console.log(titulo, conteudo, tag)
+  const { titulo, conteudo, tags } = req.body;
+
+  // Converte o array de strings em inteiros, filtrando valores inválidos
+  const tagsConvertidas = tags
+    .map(tag => parseInt(tag, 10)) // Converte cada elemento para número inteiro
+    .filter(Number.isInteger);    // Remove valores que não são inteiros
+
+  
+
+
   try {
     const access_token = req.cookies.access_token;
 
@@ -151,7 +158,7 @@ app.post('/criarNota', async (req: Request, res: Response) => {
     // Envia a requisição para a API de backend
     const response = await axios.post(
       'http://localhost:3000/nota/criar',
-      { titulo, desc: conteudo, tag }, // Dados da nota
+      { titulo, desc: conteudo, tags }, // Dados da nota
       {
         headers: {
           Authorization: `Bearer ${access_token}`, // Cabeçalhos da requisição
@@ -159,7 +166,7 @@ app.post('/criarNota', async (req: Request, res: Response) => {
       }
     );
 
-    console.log("Nota criada com sucesso:", response.data);
+    console.log(tagsConvertidas); // Exemplo: [1, 2, 3]
     return res.redirect('/'); // Redireciona para a home após criar a nota
   } catch (error) {
     console.error("Erro ao criar nota:", error);
@@ -195,12 +202,12 @@ app.post('/editarNota/:id', async (req: Request, res: Response) => {
     return res.redirect('/'); // Redireciona para a home em caso de erro
   }
 })
-
+// Funcionando
 app.post('/excluirNota/:id', async (req: Request, res: Response) => {
   const { id } = req.params;
 
-  try{
-    const access_token = req.cookies.acess_token
+  try {
+    const access_token = req.cookies.access_token;
 
     if (!access_token) {
       console.log("Token de acesso não encontrado");
@@ -208,15 +215,14 @@ app.post('/excluirNota/:id', async (req: Request, res: Response) => {
     }
 
     const response = await axios.delete(
-      `http://localhost:3000/nota/editar/${req.params.id}`,
+      `http://localhost:3000/nota/deletar/${req.params.id}`,
       {
         headers: {
           Authorization: `Bearer ${access_token}`
         }
       })
-
-  }catch(error){
-    console.error("Erro ao atualizar nota:");
+  } catch (error) {
+    console.error("Erro ao excluir nota:");
     return res.redirect('/');
   }
 
@@ -272,14 +278,14 @@ app.post('/excluirTag/:id', async (req: Request, res: Response) => {
     res.status(200).json({ success: true, message: `Tag com ID editada com sucesso!` });
     return res.redirect('/'); // Redireciona para a home após excluir a tag
   } catch (error) {
-    
+
   }
 })
 // Funcionando
 app.post('/editarTag/:id', async (req: Request, res: Response) => {
   const { titulo, cor } = req.body;
-  console.log("valores a serem editados aqui ->",titulo,cor)
-  try{
+  console.log("valores a serem editados aqui ->", titulo, cor)
+  try {
     const access_token = req.cookies.access_token;
 
     if (!access_token) {
@@ -302,7 +308,7 @@ app.post('/editarTag/:id', async (req: Request, res: Response) => {
       }
     )
 
-  }catch(error){
+  } catch (error) {
 
   }
 
