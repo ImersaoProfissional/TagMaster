@@ -12,6 +12,7 @@ import { Nota } from './nota/nota.entity';
 import { Tags } from './tags/tags.entity';
 import { AuthGuard } from './auth/auth.guard';
 import { APP_GUARD,  } from '@nestjs/core';
+import { ActivityMiddleware } from './app.middleware';
 
 @Module({
   imports: [
@@ -40,4 +41,7 @@ import { APP_GUARD,  } from '@nestjs/core';
   ],
 })
 export class AppModule{
+  // configure(consumer: MiddlewareConsumer) {
+  //   consumer.apply(ActivityMiddleware).forRoutes('*'); // Aplique para todas as rotas
+  // }
 }

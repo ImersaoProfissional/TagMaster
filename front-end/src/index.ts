@@ -1,7 +1,7 @@
 import express, { Request, Response } from 'express';
 import path from 'path';
 import cookieParser from 'cookie-parser';
-import axios from 'axios';
+import axios, { AxiosResponse } from 'axios';
 
 const app = express();
 const port = 3001;
@@ -19,6 +19,60 @@ app.use(cookieParser());
 // Middleware para arquivos estáticos (opcional)
 // app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.static('src'));
+
+// Rota da página inicial --> sendo validado a possibilidade
+
+app.get('/', async (req: Request, res: Response) => {
+  try {
+    const access_token = req.cookies.access_token;
+
+    if (!access_token) {
+      console.log("Acess_token vazio");
+      return res.redirect('login');
+    }
+
+    // Tentando buscar as notas com verificação de erro
+    const notasResponse: AxiosResponse | void = await axios.get('http://localhost:3000/nota', {
+      headers: { Authorization: `Bearer ${access_token}` },
+    }).catch(error => {
+      if (error.response && error.response.status === 401) {
+        console.log("Token expirado ou inválido");
+        return res.redirect('/login');
+      }
+      throw error;
+    });
+
+    // Verifica se a resposta de notas está válida
+    if (!notasResponse || !notasResponse.data) {
+      throw new Error("Erro ao buscar notas");
+    }
+
+    // Tentando buscar as tags com verificação de erro
+    const tagsResponse: AxiosResponse | void = await axios.get('http://localhost:3000/tags', {
+      headers: { Authorization: `Bearer ${access_token}` },
+    }).catch(error => {
+      if (error.response && error.response.status === 401) {
+        console.log("Token expirado ou inválido");
+        return res.redirect('/login');
+      }
+      throw error;
+    });
+
+    // Verifica se a resposta de tags está válida
+    if (!tagsResponse || !tagsResponse.data) {
+      throw new Error("Erro ao buscar tags");
+    }
+
+    // Renderiza a página com os dados válidos
+    return res.render('home', { notas: notasResponse.data, tags: tagsResponse.data });
+
+  } catch (error) {
+    console.error("Erro ao buscar notas ou tags:", error);
+    return res.render('home'); // Renderiza sem dados em caso de erro
+  }
+});
+
+
 
 // Rota de login
 app.get('/login', async (req: Request, res: Response) => {
@@ -61,7 +115,8 @@ app.post('/login', async (req: Request, res: Response) => {
     res.cookie("access_token", access_token, {
       httpOnly: true,
       secure: false,
-      maxAge: 24 * 60 * 60 * 1000 // 1 dia em milisegundos
+      maxAge: 24 * 60 * 60 * 1000,// 1 dia em milisegundos
+      path: '/'
     });
 
   } catch (error) {
@@ -105,32 +160,6 @@ app.post('/cadastro', async (req: Request, res: Response) => {
   }
 });
 
-// Rota da página inicial --> sendo validado a possibilidade
-app.get('/', async (req: Request, res: Response) => {
-  try {
-    // Valida se o token está presente
-    const access_token = req.cookies.access_token;
-
-    if (!access_token) {
-      console.log("Acess_token vazio")
-      return res.redirect('login');
-    }
-
-    const notas = await axios.get('http://localhost:3000/nota', {
-      headers: { Authorization: `Bearer ${access_token}` },
-    });
-
-    const tags = await axios.get('http://localhost:3000/tags', {
-      headers: { Authorization: `Bearer ${access_token}` },
-    });
-
-
-    return res.render('home', { notas: notas.data, tags: tags.data });// Renderiza a página com as notas retornadas
-  } catch (error) {
-    console.error("Erro ao buscar notas");
-    return res.render('home'); // Renderiza a página sem as notas, exibindo o erro (se necessário)
-  }
-});
 
 // CRUD Notas
 // Funcionando
@@ -168,7 +197,6 @@ app.post('/criarNota', async (req: Request, res: Response) => {
 
 app.post('/editarNota/:id', async (req: Request, res: Response) => {
   const { titulo, conteudo, data, tags } = req.body
-  console.log(titulo, conteudo, data, tags, req.params.id)
   try {
     const access_token = req.cookies.access_token;
 
@@ -187,7 +215,6 @@ app.post('/editarNota/:id', async (req: Request, res: Response) => {
       }
     )
 
-    console.log("Nota atualizada com sucesso:", response.data);
     return res.redirect('/'); // Redireciona para a home após editar a nota
   } catch (error) {
     console.error("Erro ao atualizar nota:");
@@ -241,7 +268,6 @@ app.post('/criarTag', async (req: Request, res: Response) => {
         }
       }
     )
-    console.log("Tag criada com sucesso:", response.data);
     return res.redirect('/'); // Redireciona para a home após criar tag
   } catch (error) {
     console.error("Erro ao criar tag:", error);
