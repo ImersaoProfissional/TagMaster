@@ -23,6 +23,11 @@ export class NotaController {
         await this.notaService.editNota(editNotaDto, id)
     }
 
+    @Put('recuperar/:id')
+    async recuperarNota(@Param('id') id: number){
+        return this.notaService.recuperarNota(id);
+    }
+
     @Delete('deletar/:id')
     async deletarNota(@Param('id') id: number) {
         return await this.notaService.deleteNota(id)
@@ -52,4 +57,5 @@ export class NotaController {
         return this.notaService.allNotasByUserDesativadas(user);
 
     }
+
 }

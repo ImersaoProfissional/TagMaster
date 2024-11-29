@@ -146,4 +146,15 @@ export class NotaService {
         return this.notaRepository.save(nota);
     }
 
+    async recuperarNota(id: number){
+        const nota = await this.findNotaBy({ id: id })
+
+        if (!nota)
+            throw new NotFoundException("Não foi achada a nota excluida")
+
+        nota.isActive = true;
+
+        return this.notaRepository.save(nota)
+    }
+
 }

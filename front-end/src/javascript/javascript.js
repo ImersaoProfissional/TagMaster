@@ -179,6 +179,8 @@ function excluirNota(id) {
       alert("Erro ao excluir a nota");
     }
   });
+
+  renderizarNotas();
 }
 // Funcionando -> falta mostrar tags
 function visualizarNota(tags, id, titulo, desc, data) {
@@ -336,7 +338,7 @@ function openPopupCriarNotas(tags) {
   }
 }
 
-openPopupFiltrarNota.addEventListener("click", () => {
+function openPopupFiltrarNotasPorTags(notas, tags) {
   overlay.style.display = "flex"; // Exibe o overlay e o popup
 
   const popup = document.querySelector(".popup"); // Certifique-se de que o seletor corresponde ao elemento correto
@@ -350,37 +352,39 @@ openPopupFiltrarNota.addEventListener("click", () => {
                     <h5 class="fw-bold">Obrigatórios</h5>
                     <p>serão exibidas notas marcadas com todas as tags selecionadas nesse campo.</p>
                     <div class="p-2 mb-2 bg-secondary-subtle text-white rounded">  
-                       
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="checkbox" id="inlineCheckbox1" name="tags" value="faculdade">
-                            <label class="form-check-label tag tag-faculdade" for="inlineCheckbox1">Faculdade</label>
-                        </div>
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="checkbox" id="inlineCheckbox2" name="tags" value="urgente">
-                            <label class="form-check-label tag tag-urgente" for="inlineCheckbox2">Urgente</label>
-                        </div>
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="checkbox" id="inlineCheckbox2" name="tags" value="urgente">
-                            <label class="form-check-label tag bg-secondary" for="inlineCheckbox2">Sem tag</label>
-                        </div>
+                        ${tags
+                          .map(
+                            (tag) => `
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" id="inlineCheckbox1" name="tags" value="${tag.id}">
+                    <label class="form-check-label tag text-white" style="background-color: ${tag.cor};" for="inlineCheckbox1">
+                        ${tag.titulo}
+                    </label>
+                </div>
+
+                `
+                          )
+                          .join("")}
+                        
                     </div>
 
                     <h5 class="fw-bold">Opcionais</h5>
                     <p>Serão exibidas notas marcadas com ao menos uma das tags selecionadas nesse campo.</p>
                     <div class="p-2 mb-2 bg-secondary-subtle rounded">
                        
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="checkbox" id="inlineCheckbox1" name="tags" value="faculdade">
-                            <label class="form-check-label tag tag-faculdade" for="inlineCheckbox1">Faculdade</label>
-                        </div>
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="checkbox" id="inlineCheckbox2" name="tags" value="urgente">
-                            <label class="form-check-label tag tag-urgente" for="inlineCheckbox2">Urgente</label>
-                        </div>
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="checkbox" id="inlineCheckbox2" name="tags" value="urgente">
-                            <label class="form-check-label tag bg-secondary text-white" for="inlineCheckbox2">Sem tag</label>
-                        </div>
+                        ${tags
+                          .map(
+                            (tag) => `
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" id="inlineCheckbox1" name="tags" value="${tag.id}">
+                    <label class="form-check-label tag text-white" style="background-color: ${tag.cor};" for="inlineCheckbox1">
+                        ${tag.titulo}
+                    </label>
+                </div>
+
+                `
+                          )
+                          .join("")}
                     </div>
 
                 </div>
@@ -390,8 +394,42 @@ openPopupFiltrarNota.addEventListener("click", () => {
                 </div>
             </form>
     `;
+    const form = document.getElementById("formCriarNota");
+    form.addEventListener("submit", (event) => {
+      event.preventDefault(); // Previne o envio do formulário
+
+      // Captura as tags selecionadas
+      const obrigatorias = [];
+      const opcionais = [];
+
+      // Captura as tags obrigatórias
+      const checkboxesObrigatorios = document.querySelectorAll(
+        'input[name="tags"]:checked'
+      );
+      checkboxesObrigatorios.forEach((checkbox) => {
+        const tagId = checkbox.value;
+        if (
+          checkbox
+            .closest(".bg-secondary-subtle")
+            .classList.contains("text-white")
+        ) {
+          obrigatorias.push(tagId);
+        } else {
+          opcionais.push(tagId);
+        }
+      });
+
+      const tagsSelecionadas = { obrigatorias, opcionais };
+      console.log("FILTREI AS TAGS", tagsSelecionadas);
+      console.log("NOTAS PASSADAS", notas);
+      // Filtra as notas com as tags selecionadas
+      const notasFiltradas = filtrarPorTags(notas, tagsSelecionadas);
+      console.log("FILTREI KRL", notasFiltradas);
+      // Renderiza as notas filtradas
+      renderizarNotas(notasFiltradas, tagsSelecionadas);
+    });
   }
-});
+}
 
 openPopupLixeira.addEventListener("click", () => {
   overlay.style.display = "flex"; // Exibe o overlay e o popup
@@ -461,19 +499,21 @@ overlay.addEventListener("click", (event) => {
 });
 
 //ordenarPorData
-function renderizarNotas(notas, tags){
-  const listaNotas = document.getElementById('listaNotas');
-  listaNotas.innerHTML = '';
-  notas.forEach(nota => {
-      // Mapeia as tags
-      const listaTagsHTML = nota.tags.map(tag => {
-      return `<span class="tag" style="background-color: ${tag.cor}; color: white;">
+function renderizarNotas(notas, tags) {
+  const listaNotas = document.getElementById("listaNotas");
+  listaNotas.innerHTML = "";
+  notas.forEach((nota) => {
+    // Mapeia as tags
+    const listaTagsHTML = nota.tags
+      .map((tag) => {
+        return `<span class="tag" style="background-color: ${tag.cor}; color: white;">
                   ${tag.titulo}
                   </span>`;
-  }).join('');
+      })
+      .join("");
 
-  const tr = document.createElement('tr');
-  tr.innerHTML= `<tr>
+    const tr = document.createElement("tr");
+    tr.innerHTML = `<tr>
               <td>
                   ${nota.titulo}
               </td>
@@ -481,7 +521,11 @@ function renderizarNotas(notas, tags){
                   ${nota.desc}
                   </td>
                   <td>
-                      ${nota.tags && nota.tags.length ? listaTagsHTML : '<p>Sem tags disponíveis.</p>'}
+                      ${
+                        nota.tags && nota.tags.length
+                          ? listaTagsHTML
+                          : "<p>Sem tags disponíveis.</p>"
+                      }
               </td>
               <td>
                   ${new Date(nota.data).toLocaleDateString()}
@@ -504,17 +548,29 @@ function renderizarNotas(notas, tags){
                       </td>
           </tr>`;
 
-          const btnEditar = tr.querySelector('#openPopupeEditar');
-          btnEditar.addEventListener('click', () => {
-              editarNota(tags, nota.id, `${nota.titulo}`, `${nota.desc}`, `${new Date(nota.data).toLocaleDateString('en-CA').replace(/\//g, '-')}`);
-          });
+    const btnEditar = tr.querySelector("#openPopupeEditar");
+    btnEditar.addEventListener("click", () => {
+      editarNota(
+        tags,
+        nota.id,
+        `${nota.titulo}`,
+        `${nota.desc}`,
+        `${new Date(nota.data).toLocaleDateString("en-CA").replace(/\//g, "-")}`
+      );
+    });
 
-          const btnVizualizar = tr.querySelector('#openPopupeVizualizar');
-          btnVizualizar.addEventListener('click', () => {
-              visualizarNota(tags, nota.id, `${nota.titulo}`, `${nota.desc}`, `${new Date(nota.data).toLocaleDateString('en-CA').replace(/\//g, '-')}`);
-          });
-          listaNotas.appendChild(tr);
-      });
+    const btnVizualizar = tr.querySelector("#openPopupeVizualizar");
+    btnVizualizar.addEventListener("click", () => {
+      visualizarNota(
+        tags,
+        nota.id,
+        `${nota.titulo}`,
+        `${nota.desc}`,
+        `${new Date(nota.data).toLocaleDateString("en-CA").replace(/\//g, "-")}`
+      );
+    });
+    listaNotas.appendChild(tr);
+  });
 }
 
 let ordemCrescente = false;
@@ -529,8 +585,27 @@ function ordenarNotasPorData(notas, tags) {
       return dataB - dataA; //Decrescente
     }
   });
-  
+
   ordemCrescente = !ordemCrescente;
+
+  renderizarNotas(ordenadas, tags);
+}
+
+
+
+function filtrarPorTags(notas, tags) {
+
   
-  renderizarNotas(ordenadas, tags)
+  return notas.filter((nota) => {
+    // Verifica se a nota contém todas as tags obrigatórias
+    const tagsObrigatorias = tags.obrigatorias;
+    const tagsOpcionais = tags.opcionais;
+
+      const temTagsObrigatorias = tagsObrigatorias.every(
+        (tagId) =>
+          nota.tags.some((tag) => String(tag.id) === String(tagId)) &&
+        nota.tags.length === tagsObrigatorias.length
+      );
+      return temTagsObrigatorias;
+  });
 }
