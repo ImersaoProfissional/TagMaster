@@ -74,7 +74,7 @@ TagMaster é uma aplicação voltada para o gerenciamento de notas. Com este sis
 
 10. Inicie o servidor do frontend:
     ```bash
-    npm run start
+    npm run dev
     ```
 
 ## Rotas da API
