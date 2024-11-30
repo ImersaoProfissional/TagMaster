@@ -12,8 +12,6 @@ export class NotaController {
     @Post('criar')
     async criarNotaUser(@Body() notaDto: NotaDTO, @Request() req: Request) {
         const user = await req['user'];
-
-        console.log('Controller ->', notaDto.tags);
         
         return this.notaService.createNota(notaDto, user);
     }
@@ -51,10 +49,13 @@ export class NotaController {
     }
 
 
-    @Get('excluidas')
+    @Get('excluir/excluida')
     async todasNotasUserExcluidas(@Request() req: Request) {
         const user = await req['user'];
-        return this.notaService.allNotasByUserDesativadas(user);
+        console.log(user)
+        const a = this.notaService.allNotasByUserDesativadas(user)
+        console.log(a)
+        return a
 
     }
 

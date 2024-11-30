@@ -21,6 +21,9 @@
 </head>
 
 <body>
+    <%if (mensagem) {%>
+        <script> alert("<%= mensagem %>")</script>
+    <%}%>
     <div class="login-container">
         <div class="login-logo">
             <img src="../images/image.png" alt="Logo">
@@ -44,9 +47,6 @@
             <div class="mb-3 flex text-center">
                 <span class="text-muted">Não tem uma conta?</span>
                 <a href="#" class="btn azulEscuro w-100 mt-2" onclick="window.location.href='/cadastro'">Criar nova conta</a>
-            </div>
-            <div>
-                <button type="button" class="btn btn-outline-secondary w-100" onclick="window.location.href='/'">Entrar sem login</button>
             </div>
         </form>
     </div>

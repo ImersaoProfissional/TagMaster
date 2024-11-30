@@ -20,7 +20,7 @@ export class MailerService {
         if(!token)
             throw new Error("O campo de token está vazio ou inválido!");
 
-        const verificationUrl = `http://localhost:3000/auth/verifyEmail/${token}`;
+        const verificationUrl = `http://localhost:3001/emailVerificado/${token}`;
         
         if(!email || email.trim() === ""){
             throw new Error('O campo "email" está vazio ou inválido!');

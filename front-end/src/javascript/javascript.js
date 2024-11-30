@@ -327,7 +327,6 @@ function openPopupCriarNotas(tags) {
                 `
                   )
                   .join("")}
-                <button type="button" class="btn btn-outline-secondary tag">+ Adicionar Tag</button>
             </div>
             <div class="d-flex justify-content-between mb-3 p-2">
                 <button type="button" class="btn btn-danger mb-3" id="closePopup" onClick='fecharPopup()'>Cancelar</button>
@@ -365,29 +364,6 @@ function openPopupFiltrarNotasPorTags(notas, tags) {
                 `
                           )
                           .join("")}
-                        
-                    </div>
-
-                    <h5 class="fw-bold">Opcionais</h5>
-                    <p>Serão exibidas notas marcadas com ao menos uma das tags selecionadas nesse campo.</p>
-                    <div class="p-2 mb-2 bg-secondary-subtle rounded">
-                       
-                        ${tags
-                          .map(
-                            (tag) => `
-                <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="checkbox" id="inlineCheckbox1" name="tags" value="${tag.id}">
-                    <label class="form-check-label tag text-white" style="background-color: ${tag.cor};" for="inlineCheckbox1">
-                        ${tag.titulo}
-                    </label>
-                </div>
-
-                `
-                          )
-                          .join("")}
-                    </div>
-
-                </div>
                 <div class="d-flex justify-content-between mb-3 p-2">
                     <button type="button" class="btn btn-danger" id="closePopup">Cancelar</button>
                     <button type="submit" class="btn azulEscuro">Confirmar</button>
@@ -431,42 +407,17 @@ function openPopupFiltrarNotasPorTags(notas, tags) {
   }
 }
 
-openPopupLixeira.addEventListener("click", () => {
+function abrirPopupLixeira(notas){
   overlay.style.display = "flex"; // Exibe o overlay e o popup
 
   const popup = document.querySelector(".popup"); // Certifique-se de que o seletor corresponde ao elemento correto
 
-  if (popup) {
-    popup.innerHTML = `
-         <h1 class="fs-1 text- azulEscuro text-white p-2 fw-bold">Lixeira</h1>
-            <div class="container">
-                <table class="table  table-secondary table-bordered table-hover align-middle">
-                    <thead>
-                        <tr>
-                            <th scope="col">Título</th>
-                            <th scope="col">Descrição</th>
-                            <th scope="col">Recuperar</th>
-
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>Fazer EAP</td>
-                            <td>Fazer vídeo da AEP para entregar 18/11
-                            <td>
-                                <button type="button" class="btn btn-primary"
-                                    style="--bs-btn-padding-y: .25rem; --bs-btn-padding-x: .5rem; --bs-btn-font-size: .75rem;">
-                                    Recuperar
-                                </button>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-                <button type="button" class="btn azulEscuro mb-2" id="closePopup">Voltar</button>
-            </div>
-    `;
-  }
-});
+  // if (popup) {
+  //   popup.innerHTML = `
+         
+  //   `;
+  // }
+}
 
 function fecharPopup() {
   overlay.style.display = "none";
@@ -590,8 +541,6 @@ function ordenarNotasPorData(notas, tags) {
 
   renderizarNotas(ordenadas, tags);
 }
-
-
 
 function filtrarPorTags(notas, tags) {
 

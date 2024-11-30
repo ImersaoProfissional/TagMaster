@@ -97,7 +97,7 @@ export class NotaService {
     }
 
     async allNotasByUserDesativadas(user: User) {
-
+        
         const userComNotas = await this.userService.puxarNotasDesativadas(user);
         if (!userComNotas)
             throw new NotFoundException("Nenhum id de notas está sendo achado")
@@ -107,7 +107,7 @@ export class NotaService {
         })
 
         console.log("OLHA EU", userComNotas.notas); // excluir
-        return userComNotas.notas;
+        return notasDesativadas;
     }
 
     async allTagsInNota(titulo: string) {

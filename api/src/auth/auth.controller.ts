@@ -62,7 +62,7 @@ export class AuthController {
 
     @Public()
     @HttpCode(HttpStatus.OK)
-    @Post('enviar/email')
+    @Post('enviar/Email')
     async verifyEmail(@Body() { email }: { email: string }) {
         const token = await this.authService.generateEmailVerifyToken(email);
         await this.mailService.sendVerificationEmail(email, token);
@@ -71,7 +71,7 @@ export class AuthController {
 
     @Public()
     @HttpCode(HttpStatus.OK)
-    @Post('verificar/email/:token')
+    @Post('verificar/Email/:token')
     async verifyEmailToken(@Param('token') token: string) {
         const result = await this.authService.verifyEmailToken(token);
 

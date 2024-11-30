@@ -28,8 +28,7 @@
                 <button type="button" class="btn btn-secondary text-white me-4 btn-lg"
                     onclick="abrirPopupTags(<%= JSON.stringify(tags) %>)">TAGS</button>
                 <button type="button" class="btn btn-secondary text-white me-4 btn-lg"
-                    id="openPopupLixeira">LIXEIRA</button>
-                <button type="button" class="btn btn-secondary  text-white me-4 btn-lg">ENTRAR</button>
+                    onclick="abrirPopupLixeira(<%= JSON.stringify(notas) %>)">LIXEIRA</button>
             </div>
         </div>
     </nav>
@@ -74,7 +73,36 @@
     </main>
     <div class="overlay" id="overlay">
         <div class="popup position-relative rounded-3 overflow-hidden">
+            <h1 class="fs-1 text- azulEscuro text-white p-2 fw-bold">Lixeira</h1>
+            <div class="container">
+                <table class="table  table-secondary table-bordered table-hover align-middle">
+                    <thead>
+                        <tr>
+                            <th scope="col">Título</th>
+                            <th scope="col">Descrição</th>
+                            <th scope="col">Recuperar</th>
 
+                        </tr>
+                    </thead>
+                    <tbody>
+                            <% notasExcluidas.forEach((nota) => { %>  
+                                <tr>
+                                    <td><%= nota.titulo %></td>
+                                    <td><%= nota.des %></td>
+                                    <td>
+                                        <button type="button" class="btn btn-primary"
+                                            style="--bs-btn-padding-y: .25rem; --bs-btn-padding-x: .5rem; --bs-btn-font-size: .75rem;">
+                                            Recuperar
+                                        </button>
+                                    </td>
+                                </tr>
+                            <% }) %>
+                    </tbody>
+                    
+                    
+                </table>
+                <button type="button" class="btn btn-danger mb-3" id="closePopup">Voltar</button>
+            </div>
         </div>
     </div>
 

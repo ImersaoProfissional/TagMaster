@@ -22,6 +22,21 @@ app.use(express.static('src'));
 
 // Rota da página inicial --> sendo validado a possibilidade
 
+app.get('/emailVerificado/:token', async (req: Request, res: Response) => {
+    const tokenVerificar = req.params.token
+    res.render('emailVerificado', {token: tokenVerificar})
+});
+
+app.post('/emailVerificado/:token', async (req: Request, res: Response) => {
+  const tokenValidarEmail = req.params.token
+
+  const response = await axios.post(`http://localhost:3000/auth/verificar/Email/${tokenValidarEmail}`, {
+  });
+
+  console.log("OLHA A VERIFICAÇÃO",response);
+  res.redirect('/login?mensagem=Email+verificado');
+});
+
 app.get('/', async (req: Request, res: Response) => {
   try {
     const access_token = req.cookies.access_token;
@@ -58,13 +73,19 @@ app.get('/', async (req: Request, res: Response) => {
       throw error;
     });
 
+    const notaExcluidasResponse = await axios.get('http://localhost:3000/nota/excluir/excluida', {
+      headers: { Authorization: `Bearer ${access_token}` },
+    });
+  
+
     // Verifica se a resposta de tags está válida
     if (!tagsResponse || !tagsResponse.data) {
       throw new Error("Erro ao buscar tags");
     }
 
+    console.log("Notas excluidas aqui -> ",notaExcluidasResponse.data)
     // Renderiza a página com os dados válidos
-    return res.render('home', { notas: notasResponse.data, tags: tagsResponse.data });
+    return res.render('home', { notas: notasResponse.data, tags: tagsResponse.data, notasExcluidas: notaExcluidasResponse.data});
 
   } catch (error) {
     console.error("Erro ao buscar notas ou tags:", error);
@@ -76,6 +97,7 @@ app.get('/', async (req: Request, res: Response) => {
 
 // Rota de login
 app.get('/login', async (req: Request, res: Response) => {
+  const mensagem = req.query.mensagem;
   try {
     const access_token = req.cookies.access_token;
     console.log(access_token + "<-- acess token") // validar se esta chamado o acess token
@@ -93,10 +115,10 @@ app.get('/login', async (req: Request, res: Response) => {
     }
   } catch (error) {
     console.error('Erro ao validar o token:', error);
-    res.render('login');
+    res.render('login', {mensagem: mensagem});
     // Pode adicionar uma mensagem de erro ou logar o problema
   }
-  res.render('login');
+  res.render('login', {mensagem: mensagem});
 });
 
 app.post('/login', async (req: Request, res: Response) => {
@@ -147,6 +169,10 @@ app.post('/cadastro', async (req: Request, res: Response) => {
       name,
       email,
       password,
+    });
+
+    await axios.post("http://localhost:3000/auth/enviar/Email", {
+      email
     });
 
     // Redireciona para login em caso de sucesso
