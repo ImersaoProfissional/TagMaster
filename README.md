@@ -104,4 +104,8 @@ TagMaster é uma aplicação voltada para o gerenciamento de notas. Com este sis
 - **DELETE** `/tags/deletar/:id` - Deleta uma tag pelo ID.  
 
 ### Assista ao vídeo explicativo de como compilar o projeto
-[![Texto Alternativo](https://www.ocasaldafoto.com/wp-content/uploads/2018/09/Foto-de-Paisagem-Lago-da-Pampulha-Belo-Horizonte-Charles-Torres.jpg)]()
+
+[Assista ao vídeo no YouTube](https://youtu.be/94ufr6xUzbw)
+
+
+
